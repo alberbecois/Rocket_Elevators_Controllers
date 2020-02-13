@@ -1,9 +1,10 @@
 '------DEFINITIONS------'
 Battery: Can be ON or OFF
 Column: Can be ACTIVE or INACTIVE
-Cage: Can be IDLE or IN-TRANSIT
+Cage: Can be IDLE, LOADING, IN-SERVICE, or OOO (Out-of-order)
 Doors: Can be OPEN or CLOSED
 Floor: Destination served by the Cage
+Direction: Can be UP or DOWN
 Call Buttons: Can send a pickup request to the destination queue
 Floor Buttons: Can send an add destination request to the destination queue
 Door Open Button: Can request a delay to the close door timer
@@ -20,7 +21,8 @@ SEQUENCE Startup USING Battery
     SET cage_floor TO 1
 END SEQUENCE
 
-SEQUENCE
+'------CALL BUTTONS------'
+SEQUENCE call_button_request USING Direction AND Floor
     
 END SEQUENCE
 
