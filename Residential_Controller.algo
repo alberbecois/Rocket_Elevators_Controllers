@@ -1,0 +1,26 @@
+'------DEFINITIONS------'
+Battery: Can be ON or OFF
+Column: Can be ACTIVE or INACTIVE
+Cage: Can be IDLE or IN-TRANSIT
+Doors: Can be OPEN or CLOSED
+Floor: Destination served by the Cage
+Call Buttons: Can send a pickup request to the destination queue
+Floor Buttons: Can send an add destination request to the destination queue
+Door Open Button: Can request a delay to the close door timer
+Door Close Button: Can request to close the door
+
+
+SEQUENCE Startup USING Battery
+    IF Battery is ON SET Column TO ACTIVE
+    SET Doors TO CLOSED
+    SET total_floors TO 10
+    SET total_columns TO 1
+    SET total_cages TO 2
+    SET cage_status TO IDLE
+    SET cage_floor TO 1
+END SEQUENCE
+
+SEQUENCE
+    
+END SEQUENCE
+
