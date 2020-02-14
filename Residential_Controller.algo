@@ -9,6 +9,7 @@ Call Buttons: Can send a pickup request to the destination queue
 Floor Buttons: Can send an add destination request to the destination queue
 Door Open Button: Can request a delay to the close door timer
 Door Close Button: Can request to close the door
+Weight Sensor: Detects weight load of the current cage
 
 
 SEQUENCE Startup USING Battery
@@ -82,10 +83,22 @@ SEQUENCE open_door USING cage
     SET call_button TO INACTIVE
 END SEQUENCE
 
+SEQUENCE open_button_pressed
+    IF cage_status IS NOT IN-SERVICE
+        CALL open_door WITH cage
+    END IF
+END SEQUENCE
+
 SEQUENCE close_door USING cage
     IF door_sensor_status IS CLEAR THEN
         CLOSE doors
         SET cage_status TO IN-SERVICE
+    END IF
+END SEQUENCE
+
+SEQUENCE close_button_pressed
+    IF cage_status IS LOADING AND Timer is at less than 5 seconds
+        CALL close_door USING cage
     END IF
 END SEQUENCE
 
@@ -114,4 +127,25 @@ SEQUENCE move_up USING cage AND requested_floor
     CALL open_door USING cage
 END SEQUENCE
 
+'------CAGE MANAGER------'
+SEQUENCE cage_manager USING cage AND direction AND sorted_list
+    WHILE sorted_list IS NOT EMPTY
+        READ requested_floor FROM sorted_list
+            IF cage_floor IS requested_floor THEN
+                CALL open_door WITH cage
+            ELSE IF cage_floor IS > requested_floor THEN
+                CALL move_down WITH cage AND requested_floor
+            ELSE IF cage_floor IS < requested_floor THEN
+                CALL move_up WITH cage AND requested_floor
+            END IF
+        END WHILE
+    SET cage_status TO IDLE
+END SEQUENCE
 
+'------WEIGHT SENSOR------'
+SEQUENCE detect_weight USING cage
+READ weight FROM weight_sensor
+    IF weight IS > max_weight
+        CALL open_door UNTIL weight under limit
+    END IF
+END SEQUENCE
