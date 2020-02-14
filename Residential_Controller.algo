@@ -23,25 +23,95 @@ END SEQUENCE
 
 '------CALL BUTTONS------'
 SEQUENCE request_pickup USING requested_direction AND requested_floor
-    CALL locate_least_busy_cage WITH requested_direction AND requested_floor
+    CALL locate_available_cage WITH requested_direction AND requested_floor RETURNING least_busy_cage
+    CALL send_request WITH requested_floor AND least_busy_cage
 END SEQUENCE
 
 SEQUENCE call_button_pressed
-    SET call_button TO active 
+    SET call_button TO ACTIVE 
     READ requested_direction AND requested_floor
-    CALL request_pickup WITH requested_direction AND requested_floor RETURNING least_busy_cage
+    CALL request_pickup WITH requested_direction AND requested_floor
 END SEQUENCE
 
 '------FLOOR BUTTONS------'
+SEQUENCE floor_button_pressed USING cage
+    SET floor_button TO ACTIVE 
+    READ requested_floor
+    CALL send_request WITH requested_floor AND cage
+END SEQUENCE
 
-
-'------CAGE MANAGER------'
-SEQUENCE locate_least_busy_cage USING requested_direction AND requested_floor 
+'------CAGE FINDER------'
+SEQUENCE locate_available_cage USING requested_direction AND requested_floor 
     FOR EACH cage in cages
-        IF list_length of current_cage < list_length of least_busy_cage
-            SET least_busy_cage TO current_cage
+        IF cage_status is IDLE
+            SET least_busy_cage TO cage
+            RETURN least_busy_cage
+        END IF
+        ELSE IF list_length of cage < list_length of least_busy_cage AND cage_direction = requested_direction
+            SET least_busy_cage TO cage
+        ELSE
+            COMPUTE shortest cage length regardless of direction and set that cage as least_busy_cage
         END IF
         RETURN least_busy_cage
     END FOR
 END SEQUENCE
+
+'------REQUEST CAGE------'
+SEQUENCE send_request USING least_busy_cage AND requested_floor
+    ADD requested_floor TO requests_list
+    CALL sort_list WITH requests_list RETURNING sorted_list
+END SEQUENCE
+
+SEQUENCE sort_list USING requests_list AND cage_direction
+        IF cage_direction IS up THEN
+            COMPUTE requests_list BY ASCENDING
+        ELSE IF cage_direction IS down THEN
+            COMPUTE requests_list BY DESCENDING
+        END if
+    SET requests_list TO sorted_list
+    RETURN sorted_list
+END SEQUENCE
+
+'------DOORS------'
+SEQUENCE open_door USING cage
+    IF cage_status IS LOADING THEN
+        OPEN doors
+    END IF
+    SET Timer TO 8 Seconds
+    SET floor_button TO INACTIVE
+    SET call_button TO INACTIVE
+END SEQUENCE
+
+SEQUENCE close_door USING cage
+    IF door_sensor_status IS CLEAR THEN
+        CLOSE doors
+        SET cage_status TO IN-SERVICE
+    END IF
+END SEQUENCE
+
+'------CAGE MOVEMENT------'
+SEQUENCE move_down USING cage AND requested_floor
+    IF doors ARE NOT closed
+        CALL close_door WITH cage
+    END IF
+    CALL move WITH cage
+    REPEAT
+        SET cage_floor TO cage_floor - 1
+    UNTIL cage_floor IS requested_floor
+    SET cage_status TO LOADING
+    CALL open_door USING cage
+END SEQUENCE
+
+SEQUENCE move_up USING cage AND requested_floor
+    IF doors ARE NOT closed
+        CALL close_door WITH cage
+    END IF
+    CALL move WITH cage
+    REPEAT
+        SET cage_floor TO cage_floor + 1
+    UNTIL cage_floor IS requested_floor
+    SET cage_status TO LOADING
+    CALL open_door USING cage
+END SEQUENCE
+
 
