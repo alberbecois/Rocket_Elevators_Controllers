@@ -10,7 +10,7 @@ Floor Buttons: Can send an add destination request to the destination queue
 Door Open Button: Can request a delay to the close door timer
 Door Close Button: Can request to close the door
 Weight Sensor: Detects weight load of the current cage
-
+Door Sensor: Can either be CLEAR or OBSTRUCTED
 
 SEQUENCE Startup USING Battery
     IF Battery is ON SET Column TO ACTIVE
