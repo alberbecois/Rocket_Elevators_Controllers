@@ -22,7 +22,26 @@ SEQUENCE Startup USING Battery
 END SEQUENCE
 
 '------CALL BUTTONS------'
-SEQUENCE call_button_request USING Direction AND Floor
-    
+SEQUENCE request_pickup USING requested_direction AND requested_floor
+    CALL locate_least_busy_cage WITH requested_direction AND requested_floor
+END SEQUENCE
+
+SEQUENCE call_button_pressed
+    SET call_button TO active 
+    READ requested_direction AND requested_floor
+    CALL request_pickup WITH requested_direction AND requested_floor RETURNING least_busy_cage
+END SEQUENCE
+
+'------FLOOR BUTTONS------'
+
+
+'------CAGE MANAGER------'
+SEQUENCE locate_least_busy_cage USING requested_direction AND requested_floor 
+    FOR EACH cage in cages
+        IF list_length of current_cage < list_length of least_busy_cage
+            SET least_busy_cage TO current_cage
+        END IF
+        RETURN least_busy_cage
+    END FOR
 END SEQUENCE
 
