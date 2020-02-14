@@ -1,6 +1,6 @@
 '------DEFINITIONS------'
 Battery: Can be ON or OFF
-Column: Can be ACTIVE or INACTIVE
+Columns: Can be ACTIVE or INACTIVE
 Cage: Can be IDLE, LOADING, IN-SERVICE, or OOO (Out-of-order)
 Doors: Can be OPEN or CLOSED
 Floor: Destination served by the Cage
@@ -11,9 +11,13 @@ Door Open Button: Can request a delay to the close door timer
 Door Close Button: Can request to close the door
 Weight Sensor: Detects weight load of the current cage
 Door Sensor: Can either be CLEAR or OBSTRUCTED
+Col-1: Handles basements and main floor
+Col-2: Handles main floor to 20
+Col-3: Handles floor 21-40 + main floor
+Col-4: Handles floor 41-60 + main floor
 
 SEQUENCE Startup USING Battery
-    IF Battery is ON SET Column TO ACTIVE
+    IF Battery is ON SET Columns TO ACTIVE
     SET Doors TO CLOSED
     SET total_floors TO 66
     SET total_columns TO 4
@@ -30,8 +34,8 @@ END SEQUENCE
 
 SEQUENCE call_button_pressed
     SET call_button TO ACTIVE 
-    READ requested_direction AND requested_floor
-    CALL request_pickup WITH requested_direction AND requested_floor
+    READ requested_direction AND requested_floor AND column_number
+    CALL request_pickup WITH requested_direction AND requested_floor AND column_number
 END SEQUENCE
 
 '------FLOOR BUTTONS------'
@@ -42,8 +46,8 @@ SEQUENCE floor_button_pressed USING cage
 END SEQUENCE
 
 '------CAGE FINDER------'
-SEQUENCE locate_available_cage USING requested_direction AND requested_floor 
-    FOR EACH cage in cages
+SEQUENCE locate_available_cage USING requested_direction AND requested_floor AND column_number
+    FOR EACH cage in column_number cages
         IF cage_status is IDLE
             SET least_busy_cage TO cage
             RETURN least_busy_cage
@@ -148,4 +152,12 @@ READ weight FROM weight_sensor
     IF weight IS > max_weight
         CALL open_door UNTIL weight under limit
     END IF
+END SEQUENCE
+
+'------DISPLAY------'
+SEQUENCE display
+    FOR EACH cage IN cages
+        PRINT current cage_floor ON outer_display
+        PRINT current cage_floor ON inner_display
+    END FOR
 END SEQUENCE
