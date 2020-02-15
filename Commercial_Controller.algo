@@ -17,13 +17,13 @@ Col-3: Handles floor 21-40 + main floor
 Col-4: Handles floor 41-60 + main floor
 
 SEQUENCE Startup USING Battery
-    IF Battery is ON SET Columns TO ACTIVE
-    SET Doors TO CLOSED
-    SET total_floors TO 66
-    SET total_columns TO 4
-    SET total_cages TO 12
-    SET cage_status TO IDLE
-    SET cage_floor TO 1
+    IF Battery is ON SET Column TO ACTIVE
+    FOR EACH door IN doors
+        CALL close_door
+    END FOR
+    FOR EACH cage IN cages
+        SET cage_status TO IDLE
+    END FOR
 END SEQUENCE
 
 '------CALL BUTTONS------'

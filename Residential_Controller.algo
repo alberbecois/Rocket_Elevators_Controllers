@@ -14,12 +14,12 @@ Door Sensor: Can either be CLEAR or OBSTRUCTED
 
 SEQUENCE Startup USING Battery
     IF Battery is ON SET Column TO ACTIVE
-    SET Doors TO CLOSED
-    SET total_floors TO 10
-    SET total_columns TO 1
-    SET total_cages TO 2
-    SET cage_status TO IDLE
-    SET cage_floor TO 1
+    FOR EACH door IN doors
+        CALL close_door
+    END FOR
+    FOR EACH cage IN cages
+        SET cage_status TO IDLE
+    END FOR
 END SEQUENCE
 
 '------CALL BUTTONS------'
