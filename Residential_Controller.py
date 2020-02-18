@@ -16,6 +16,7 @@ battery_on = False
 total_columns = None
 cages_per_column = None
 total_floors = None
+cageManager = None
 
 
 #############
@@ -31,6 +32,28 @@ class Cage:
         self.status = status
         self.doors = doors
         self.requests = []
+        self.curFloor = 0
+        self.timer = 0
+        self.door_sensor_status = "Clear"
+
+        ## Door Methods ##
+        def openDoors(self):
+            if self.status == "Loading":
+                self.doors = "Open"
+                self.timer = 8
+        
+        def openButtonPressed(self):
+            if self.status != "In-Service":
+                self.openDoors()
+
+        def closeDoors(self):
+            if self.door_sensor_status == "Clear":
+                self.doors = "Closed"
+                self.status = "Loading"
+        
+        def closeButtonPressed(self):
+            if self.timer < 5:
+                self.closeDoors()
 
 class CageManager:
     def __init__(self):
@@ -93,8 +116,8 @@ def initialize():
     for i in range(0, len(cageManager.col_list)):
         for j in range(0, len(cageManager.col_list[i].cages)):
             print("Column " + str(i) + ": Cage " + str(j) + " is " + cageManager.col_list[i].cages[j].status + " and doors are " + cageManager.col_list[i].cages[j].doors)
-    # print("Number of cages is: " + str(len(cageManager.col_list[i].cages)))
-
-initialize()
 
 
+###########
+## Doors ##
+###########
