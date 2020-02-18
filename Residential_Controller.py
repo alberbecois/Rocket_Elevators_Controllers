@@ -20,19 +20,24 @@ cageManager = None
 
 
 #############
-## Classes ##
+## Columns ##
 #############
 class Column:
     def __init__(self, status, cages):
         self.status = status
         self.cages = cages
 
+
+###########
+## Cages ##
+###########
 class Cage:
     def __init__(self, status, doors):
         self.status = status
         self.doors = doors
         self.requests = []
         self.curFloor = 0
+        self.direction = "Up"
         self.timer = 0
         self.door_sensor_status = "Clear"
 
@@ -55,6 +60,33 @@ class Cage:
             if self.timer < 5:
                 self.closeDoors()
 
+        ## Movement ##
+        def moveDown(self, requestedFloor):
+            if self.doors != "Closed":
+                self.closeDoors()
+            else:
+                self.status = "In-Service"
+                self.direction = "Down"
+                while self.curFloor != requestedFloor:
+                    self.curFloor -= 1
+                self.status = "Loading"
+                self.openDoors()
+        
+        def moveUp(self, requestedFloor):
+            if self.doors != "Closed":
+                self.closeDoors()
+            else:
+                self.status = "In-Service"
+                self.direction = "Up"
+                while self.curFloor != requestedFloor:
+                    self.curFloor += 1
+                self.status = "Loading"
+                self.openDoors()
+            
+
+##################
+## Cage Manager ##
+##################
 class CageManager:
     def __init__(self):
         self.col_list = []
@@ -118,6 +150,3 @@ def initialize():
             print("Column " + str(i) + ": Cage " + str(j) + " is " + cageManager.col_list[i].cages[j].status + " and doors are " + cageManager.col_list[i].cages[j].doors)
 
 
-###########
-## Doors ##
-###########
