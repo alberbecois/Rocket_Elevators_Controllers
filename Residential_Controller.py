@@ -26,11 +26,10 @@ class Column:
         self.cages = cages
 
 class Cage:
-    def __init__(self, status, buttons, doors, requests):
+    def __init__(self, status, doors):
         self.status = status
-        self.buttons = buttons
         self.doors = doors
-        self.requests = requests
+        self.requests = []
 
 class CageManager:
     def __init__(self):
@@ -72,14 +71,27 @@ def initialize():
         print("Startup aborted!")
         return
     
+    # Instantiate the CageManager
     cageManager = CageManager()
+    print("\nBeginning CageManager setup...\n")
+
+    # Insert Cages into Columns
+    def instantiateCages():
+        listCages = []
+        for i in range(0, cages_per_column):
+            listCages.append(Cage("Idle", "Closed"))
+        return listCages
 
     # Insert columns into CageManager
     for i in range(0, total_columns):
-        col(i) = Column("Active", 2)
-        cageManager.col_list.append()
+        cageManager.col_list.append(Column("Active", instantiateCages()))
+        print("Column " + str(i) + " is " + cageManager.col_list[i].status)
 
-    print(cageManager.col_list)
+    # Confirm Cage status
+    for i in range(0, len(cageManager.col_list)):
+        for j in range(0, len(cageManager.col_list[i].cages)):
+            print("Column " + str(i) + ": Cage " + str(j) + " is " + cageManager.col_list[i].cages[j].status + " and doors are " + cageManager.col_list[i].cages[j].doors)
+    # print("Number of cages is: " + str(len(cageManager.col_list[i].cages)))
 
 initialize()
 
