@@ -32,6 +32,10 @@ class Cage:
         self.doors = doors
         self.requests = requests
 
+class CageManager:
+    def __init__(self):
+        self.col_list = []
+
 #############
 ## Startup ##
 #############
@@ -68,5 +72,15 @@ def initialize():
         print("Startup aborted!")
         return
     
+    cageManager = CageManager()
+
+    # Insert columns into CageManager
+    for i in range(0, total_columns):
+        col(i) = Column("Active", 2)
+        cageManager.col_list.append()
+
+    print(cageManager.col_list)
 
 initialize()
+
+
