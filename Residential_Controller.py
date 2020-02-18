@@ -1,12 +1,12 @@
-###################################################
-## {Residential Controller}
-###################################################
-## Author: {Joshua Knutson}
-## License: {GNUGPLv3}
-## Link: {https://www.gnu.org/licenses/gpl-3.0.html}
-## Version: {0.01}
-## Contact: {github.com/alberbecois}
-###################################################
+#######################################################
+## {Residential Controller}                          ##
+#######################################################
+## Author: {Joshua Knutson}                          ##
+## License: {GNUGPLv3}                               ##
+## Link: {https://www.gnu.org/licenses/gpl-3.0.html} ##
+## Version: {0.01}                                   ##
+## Contact: {github.com/alberbecois}                 ##
+#######################################################
 
 
 ######################
@@ -16,6 +16,7 @@ battery_on = False
 total_columns = None
 cages_per_column = None
 total_floors = None
+
 
 #############
 ## Classes ##
@@ -34,6 +35,7 @@ class Cage:
 class CageManager:
     def __init__(self):
         self.col_list = []
+
 
 #############
 ## Startup ##
