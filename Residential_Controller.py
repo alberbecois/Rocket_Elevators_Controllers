@@ -17,6 +17,7 @@ total_columns = None
 cages_per_column = None
 total_floors = None
 cageManager = None
+floorList = []
 
 
 #############
@@ -32,9 +33,10 @@ class Column:
 ## Cages ##
 ###########
 class Cage:
-    def __init__(self, status, doors):
+    def __init__(self, status, doors, floorButtons):
         self.status = status
         self.doors = doors
+        self.floorButtons = floorButtons
         self.requests = []
         self.curFloor = 0
         self.direction = "Up"
@@ -46,6 +48,8 @@ class Cage:
             if self.status == "Loading":
                 self.doors = "Open"
                 self.timer = 8
+                for x in floorList[self.curFloor].buttons:
+                    x.status = "Inactive"
         
         def openButtonPressed(self):
             if self.status != "In-Service":
@@ -82,8 +86,8 @@ class Cage:
                     self.curFloor += 1
                 self.status = "Loading"
                 self.openDoors()
-            
-
+        
+        
 #############
 ## Buttons ##
 #############
@@ -101,6 +105,23 @@ class CallButton:
         self.status = "Active"
         self.requestPickup(self.direction, self.floor)
 
+class FloorButton:
+    def __init__(self, floor):
+        self.floorNum = floor
+
+
+############
+## Floors ##
+############
+class Floor:
+    def __init__(self, number, buttons):
+        self.number = number
+        self.buttons = buttons
+
+    ## Reports ##
+    def getCallButtonStatus(self):
+        for i in range(0, len(self.buttons)):
+            print(self.buttons[i].direction + " button is " + self.buttons[i].status)
 
 ##################
 ## Cage Manager ##
@@ -109,6 +130,12 @@ class CageManager:
     def __init__(self):
         self.col_list = []
 
+    ## Reports ##
+    def getCageStatus(self):
+        for i in range(0, len(self.col_list)):
+            for j in range(0, len(self.col_list[i].cages)):
+                print("Column " + str(i) + ": Cage " + str(j) + " is " + self.col_list[i].cages[j].status)
+                print("Current floor: " + str(self.col_list[i].cages[j].curFloor) + " Door status: " + self.col_list[i].cages[j].doors)
 
 #############
 ## Startup ##
@@ -150,11 +177,18 @@ def initialize():
     cageManager = CageManager()
     print("\nBeginning CageManager setup...\n")
 
+    # Instantiate FloorButtons
+    def instantiateFloorButtons():
+        buttonList = []
+        for i in range(0, total_floors):
+            buttonList.append(FloorButton(i))
+        return buttonList
+    
     # Insert Cages into Columns
     def instantiateCages():
         listCages = []
         for i in range(0, cages_per_column):
-            listCages.append(Cage("Idle", "Closed"))
+            listCages.append(Cage("Idle", "Closed", instantiateFloorButtons()))
         return listCages
 
     # Insert columns into CageManager
@@ -163,8 +197,23 @@ def initialize():
         print("Column " + str(i) + " is " + cageManager.col_list[i].status)
 
     # Confirm Cage status
-    for i in range(0, len(cageManager.col_list)):
-        for j in range(0, len(cageManager.col_list[i].cages)):
-            print("Column " + str(i) + ": Cage " + str(j) + " is " + cageManager.col_list[i].cages[j].status + " and doors are " + cageManager.col_list[i].cages[j].doors)
+    cageManager.getCageStatus()
 
+    # Insert CallButtons into Floor
+    def instantiateCallButtons(floor):
+        listButtons = []
+        listButtons.append(CallButton("Up", floor))
+        listButtons.append(CallButton("Down", floor))
+        return listButtons
 
+    # Generate Floors and Call Buttons
+    for i in range(0, total_floors):
+        floorList.append(Floor(i, instantiateCallButtons(i)))
+        print("Floor " + str(floorList[i].number) + " is initialized")
+    
+    # Confirm Button status
+    for i in range(0, len(floorList)):
+        for j in range(0, len(floorList[i].buttons)):
+            print(floorList[i].buttons[j].direction + " button is ready and " + floorList[i].buttons[j].status)
+
+initialize()
