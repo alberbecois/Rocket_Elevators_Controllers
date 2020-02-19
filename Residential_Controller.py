@@ -84,6 +84,24 @@ class Cage:
                 self.openDoors()
             
 
+#############
+## Buttons ##
+#############
+class CallButton:
+    def __init__(self, direction, floor):
+        self.direction = direction
+        self.floor = floor
+        self.status = "Inactive"
+
+    def requestPickup(self, direction, floor):
+        cage = cageManager.getAvailableCage(direction, floor)
+        cageManager.sendRequest(cage)
+    
+    def callButtonPressed(self):
+        self.status = "Active"
+        self.requestPickup(self.direction, self.floor)
+
+
 ##################
 ## Cage Manager ##
 ##################
