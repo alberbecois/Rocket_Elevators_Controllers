@@ -43,53 +43,53 @@ class Cage:
         self.timer = 0
         self.door_sensor_status = "Clear"
 
-        ## Door Methods ##
-        def openDoors(self):
-            if self.status == "Loading":
-                self.doors = "Open"
-                self.timer = 8
-                for x in floorList[self.curFloor].buttons:
-                    x.status = "Inactive"
-                while self.timer > 0:
-                    self.timer -= 1
-                    time.sleep(1)
-                self.closeDoors()
-        
-        def openButtonPressed(self):
-            if self.status != "In-Service":
-                self.openDoors()
+    ## Door Methods ##
+    def openDoors(self):
+        if self.status == "Loading":
+            self.doors = "Open"
+            self.timer = 8
+            for x in floorList[self.curFloor].buttons:
+                x.status = "Inactive"
+            while self.timer > 0:
+                self.timer -= 1
+                time.sleep(1)
+            self.closeDoors()
+    
+    def openButtonPressed(self):
+        if self.status != "In-Service":
+            self.openDoors()
 
-        def closeDoors(self):
-            if self.door_sensor_status == "Clear":
-                self.doors = "Closed"
-                self.status = "Loading"
-        
-        def closeButtonPressed(self):
-            if self.timer < 5:
-                self.closeDoors()
+    def closeDoors(self):
+        if self.door_sensor_status == "Clear":
+            self.doors = "Closed"
+            self.status = "Loading"
+    
+    def closeButtonPressed(self):
+        if self.timer < 5:
+            self.closeDoors()
 
-        ## Movement ##
-        def moveDown(self, requestedFloor):
-            if self.doors != "Closed":
-                self.closeDoors()
-            else:
-                self.status = "In-Service"
-                self.direction = "Down"
-                while self.curFloor != requestedFloor:
-                    self.curFloor -= 1
-                self.status = "Loading"
-                self.openDoors()
-        
-        def moveUp(self, requestedFloor):
-            if self.doors != "Closed":
-                self.closeDoors()
-            else:
-                self.status = "In-Service"
-                self.direction = "Up"
-                while self.curFloor != requestedFloor:
-                    self.curFloor += 1
-                self.status = "Loading"
-                self.openDoors()
+    ## Movement ##
+    def moveDown(self, requestedFloor):
+        if self.doors != "Closed":
+            self.closeDoors()
+        else:
+            self.status = "In-Service"
+            self.direction = "Down"
+            while self.curFloor != requestedFloor:
+                self.curFloor -= 1
+            self.status = "Loading"
+            self.openDoors()
+    
+    def moveUp(self, requestedFloor):
+        if self.doors != "Closed":
+            self.closeDoors()
+        else:
+            self.status = "In-Service"
+            self.direction = "Up"
+            while self.curFloor != requestedFloor:
+                self.curFloor += 1
+            self.status = "Loading"
+            self.openDoors()
         
         
 #############
@@ -129,6 +129,19 @@ class Floor:
         for i in range(0, len(self.buttons)):
             print(self.buttons[i].direction + " button is " + self.buttons[i].status)
 
+
+##############
+## Requests ##
+##############
+class Request:
+    def __init__(self, status, floor):
+        self.status = status
+        self.floor = floor
+
+    def __str__(self):
+        return str(self.floor)
+
+
 ##################
 ## Cage Manager ##
 ##################
@@ -153,7 +166,26 @@ class CageManager:
                 return cage
     
     def requestElevator(self, cage, floor):
-        cage.requests.append(floor)
+        cage.requests.append(Request("Pending", floor))
+        if cage.direction == "Up":
+            cage.requests.sort(key=lambda x: x.floor, reverse=False)
+        else:
+            cage.requests.sort(key=lambda x: x.floor, reverse=True)
+
+    def dispatchElevators(self):
+        for i in range(0, len(self.col_list)):
+            for j in range(0, len(self.col_list[i].cages)):
+                curCage = self.col_list[i].cages[j]
+                while len(curCage.requests) != 0:
+                    for x in range(0, len(curCage.requests)):
+                        if curCage.requests[x].status == "Pending":
+                            if curCage.requests[x].floor > curCage.curFloor:
+                                curCage.moveUp(curCage.requests[x].floor)
+                            else:
+                                curCage.moveDown(curCage.requests[x].floor)
+                            curCage.requests[x].status = "Completed"
+                    curCage.requests.clear()
+                    curCage.status = "Idle"
 
     ## Reports ##
     def getCageStatus(self):
@@ -256,8 +288,14 @@ def main():
     initialize()
     
     # Test Function #
-    floorList[3].buttons[0].callButtonPressed()
+    floorList[3].buttons[1].callButtonPressed()
     floorList[3].getCallButtonStatus()
-    print(str(cageManager.col_list[0].cages[0].requests))
-
+    floorList[5].buttons[1].callButtonPressed()
+    floorList[5].getCallButtonStatus()
+    floorList[2].buttons[1].callButtonPressed()
+    for i in range(0, len(cageManager.col_list[0].cages[0].requests)):
+        print(cageManager.col_list[0].cages[0].requests[i])
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+    
 main()
