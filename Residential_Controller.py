@@ -47,12 +47,14 @@ class Cage:
     def openDoors(self):
         if self.status == "Loading":
             self.doors = "Open"
+            print("Cage doors are open for 8 seconds")
             self.timer = 8
             for x in floorList[self.curFloor].buttons:
                 x.status = "Inactive"
             for x in self.floorButtons:
                 x.status = "Inactive"
             while self.timer > 0:
+                print("Closing in " + str(self.timer) + " seconds")
                 self.timer -= 1
                 time.sleep(1)
             self.closeDoors()
@@ -64,6 +66,7 @@ class Cage:
     def closeDoors(self):
         if self.door_sensor_status == "Clear":
             self.doors = "Closed"
+            print("Cage doors are closed")
             self.status = "Loading"
     
     def closeButtonPressed(self):
@@ -78,7 +81,9 @@ class Cage:
             self.status = "In-Service"
             self.direction = "Down"
             while self.curFloor != requestedFloor:
+                print("Cage at " + str(self.curFloor))
                 self.curFloor -= 1
+            print("Cage at " + str(self.curFloor))
             self.status = "Loading"
             self.openDoors()
     
@@ -89,7 +94,9 @@ class Cage:
             self.status = "In-Service"
             self.direction = "Up"
             while self.curFloor != requestedFloor:
+                print("Cage at " + str(self.curFloor))
                 self.curFloor += 1
+            print("Cage at " + str(self.curFloor))
             self.status = "Loading"
             self.openDoors()
     
@@ -114,6 +121,7 @@ class CallButton:
     
     def callButtonPressed(self):
         self.status = "Active"
+        print(self.direction + " button pressed at " + str(self.column) + " column " + str(self.floor) + " floor.")
         self.requestPickup(self.direction, self.column, self.floor)
 
 class FloorButton:
@@ -124,6 +132,7 @@ class FloorButton:
 
     def floorButtonPressed(self):
         self.status = "Active"
+        print(str(self.floorNum) + " button pressed from inside the cage")
         cageManager.requestFloor(self.cage, self.floorNum)
 
 
@@ -178,6 +187,7 @@ class CageManager:
     
     def requestElevator(self, cage, floor):
         cage.requests.append(Request("Pending", floor))
+        print("Floor " + str(cage.requests[-1].floor) + " added to request list")
         if cage.direction == "Up":
             cage.requests.sort(key=lambda x: x.floor, reverse=False)
         else:
@@ -185,6 +195,7 @@ class CageManager:
 
     def requestFloor(self, cage, floor):
         cage.requests.append(Request("Pending", floor))
+        print("Floor " + str(cage.requests[-1].floor) + " added to request list")
         if cage.direction == "Up":
             cage.requests.sort(key=lambda x: x.floor, reverse=False)
         else:
@@ -312,8 +323,13 @@ def initialize():
 ###############
 ## Scenarios ##
 ###############
-def scenarios():
-    print("\nFor demonstration purposes only...")
+def demo():
+    print("\nFor demonstration purposes only...\n")
+    floorList[5].buttons[0].callButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.col_list[0].cages[0].floorButtons[1].floorButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
 
 
 ##########
@@ -323,7 +339,7 @@ def main():
     initialize()
     
     if battery_on == True:
-        scenarios()
+        demo()
     else:
         print("Exiting program")
 
