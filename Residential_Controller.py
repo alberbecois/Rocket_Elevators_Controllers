@@ -50,6 +50,8 @@ class Cage:
             self.timer = 8
             for x in floorList[self.curFloor].buttons:
                 x.status = "Inactive"
+            for x in self.floorButtons:
+                x.status = "Inactive"
             while self.timer > 0:
                 self.timer -= 1
                 time.sleep(1)
@@ -210,9 +212,9 @@ class CageManager:
                 print("Column " + str(i) + ": Cage " + str(j) + " is " + self.col_list[i].cages[j].status)
                 print("Current floor: " + str(self.col_list[i].cages[j].curFloor) + " Door status: " + self.col_list[i].cages[j].doors)
 
-#############
-## Startup ##
-#############
+####################
+## Initialization ##
+####################
 def initialize():
     # Turn on the battery
     startup = input("Activate battery? (y/n): ")
@@ -242,6 +244,8 @@ def initialize():
                 break
             except ValueError:
                 print("Please enter a valid number")
+        # Confirm setup conditions
+        print("\n---HARDWARE SIMULATION---")
         print("battery_on = ", battery_on)
         print("total_columns = ", total_columns)
         print("cages_per_column = ", cages_per_column)
@@ -254,7 +258,7 @@ def initialize():
     global cageManager
     global floorList
     cageManager = CageManager()
-    print("\nBeginning CageManager setup...\n")
+    print("\nBeginning CageManager setup...\n \n---COLUMNS AND CAGES---")
 
     # Instantiate FloorButtons
     def instantiateFloorButtons(cage):
@@ -292,15 +296,24 @@ def initialize():
         return listButtons
 
     # Generate Floors and Call Buttons
+    print("\n---FLOORS---")
     for x in range(0, total_columns):
         for i in range(0, total_floors):
             floorList.append(Floor(i, instantiateCallButtons(i, x)))
             print("Floor " + str(floorList[i].number) + " is initialized")
     
     # Confirm Button status
+    print("\n---CALL BUTTONS---")
     for i in range(0, len(floorList)):
         for j in range(0, len(floorList[i].buttons)):
-            print(str(floorList[i].buttons[j].column) + str(floorList[i].buttons[j].floor) + floorList[i].buttons[j].direction + " button is ready and " + floorList[i].buttons[j].status)
+            print(str(floorList[i].buttons[j].column) + "-" + str(floorList[i].buttons[j].floor) + " " + floorList[i].buttons[j].direction + " button is ready and " + floorList[i].buttons[j].status)
+
+
+###############
+## Scenarios ##
+###############
+def scenarios():
+    print("\nFor demonstration purposes only...")
 
 
 ##########
@@ -309,7 +322,9 @@ def initialize():
 def main():
     initialize()
     
-    # Test Function #
-    cageManager.col_list[0].cages[0].getFloorButtonStatus()
-    
+    if battery_on == True:
+        scenarios()
+    else:
+        print("Exiting program")
+
 main()
