@@ -135,12 +135,12 @@ class CageManager:
     ## Methods ##
     def getAvailableCage(self, direction, column, reqFloor):
         for i in range(0, len(self.col_list[column].cages)):
-            if self.col_list[column].cages[i].direction == direction & direction == "Up" & self.col_list[column].cages[i].curFloor < reqFloor:
+            if self.col_list[column].cages[i].direction == direction and direction == "Up" and self.col_list[column].cages[i].curFloor < reqFloor:
                 return self.col_list[column].cages[i] # Going same direction (UP) before requested floor
-            elif self.col_list[column].cages[i].direction == direction & direction == "Down" & self.col_list[column].cages[i].curFloor > reqFloor:
+            elif self.col_list[column].cages[i].direction == direction and direction == "Down" and self.col_list[column].cages[i].curFloor > reqFloor:
                 return self.col_list[column].cages[i] # Going same direction (DOWN) before requested floor
             elif self.col_list[column].cages[i].status == "Idle":
-                return self.col_list[column].cages[i] # Unoccupied
+                return self.col_list[column].cages[i] # Return an unoccupied cage
             else:
                 cage = self.col_list[column].cages[i] # Return the least busy cage
                 for j in range(0, len(self.col_list[column].cages)):
@@ -251,4 +251,9 @@ def initialize():
 def main():
     initialize()
     
+    # Test Function #
+    floorList[3].buttons[0].callButtonPressed()
+    floorList[3].getCallButtonStatus()
+    print(str(cageManager.col_list[0].cages[0].requests))
+
 main()
