@@ -8,6 +8,7 @@
 ## Contact: {github.com/alberbecois}                 ##
 #######################################################
 
+import time
 
 ######################
 ## Global Variables ##
@@ -18,7 +19,6 @@ cages_per_column = None
 total_floors = None
 cageManager = None
 floorList = []
-import time
 
 #############
 ## Columns ##
