@@ -18,7 +18,7 @@ cages_per_column = None
 total_floors = None
 cageManager = None
 floorList = []
-
+import time
 
 #############
 ## Columns ##
@@ -50,6 +50,10 @@ class Cage:
                 self.timer = 8
                 for x in floorList[self.curFloor].buttons:
                     x.status = "Inactive"
+                while self.timer > 0:
+                    self.timer -= 1
+                    time.sleep(1)
+                self.closeDoors()
         
         def openButtonPressed(self):
             if self.status != "In-Service":
