@@ -48,7 +48,7 @@ class Cage{
 
     // Door Methods //
     openDoors(){
-        if(this.status == "Loading"){
+        if(this.status === "Loading"){
             this.doors = "Open";
             console.log("Cage doors are open for 8 seconds");
             this.timer = 8;
@@ -78,7 +78,7 @@ class Cage{
     }
 
     closeDoors(){
-        if(this.door_sensor_status === "Clear"){
+        if(this.door_sensor_status === "Clear" && this.timer < 5){
             this.doors = "Closed";
             console.log("Cage doors are closed");
             this.status = "Loading";
@@ -102,6 +102,81 @@ class Cage{
             console.log("Cage " + this.id + " going down at " + this.curFloor);
             this.curFloor -= 1;
         }
+        console.log("Cage " + this.id + " at " + this.curFloor);
+        this.status = "Loading";
+        this.openDoors();
+    }
 
+    moveUp(requestedFloor){
+        while(this.doors != "Closed"){
+            this.closeDoors();
+        }
+        this.status = "In-Service";
+        this.direction = "Up";
+        while(this.curFloor != requestedFloor){
+            console.log("Cage " + this.id + " going up at " + this.curFloor);
+            this.curFloor += 1;
+        }
+        console.log("Cage " + this.id + " at " + this.curFloor);
+        this.status = "Loading";
+        this.openDoors();
+    }
+
+    // Reports //
+    getFloorButtonStatus(){
+        for(var x = 0; x < this.floorButtons; x++){
+            console.log("Floor " + this.floorButtons[x].floorNum + " Button: Ready -- Status: " + this.floorButtons[x].status);
+        }
+    }
+}
+
+
+/////////////
+// Buttons //
+/////////////
+class CallButton{
+    constructor(direction, column, floor){
+        this.direction = direction;
+        this.column = column;
+        this.floor = floor;
+        this.status = "Inactive";
+    }
+
+    // Methods //
+    requestPickup(direction, column, floor){
+        cage = cageManager.getAvailableCage(direction, column, floor);
+        cageManager.requestElevator(cage, floor);
+    }
+
+    callButtonPressed(){
+        this.status = "Active";
+        console.log(this.direction + " button pressed at " + this.column + " column " + this.floor + " floor.");
+        this.requestPickup(this.direction, this.column, this.floor);
+    }
+}
+
+class FloorButton{
+    constructor(cage, floor){
+        this.cage = cage;
+        this.floorNum = floor;
+        this.status = "Inactive";
+    }
+
+    // Methods //
+    floorButtonPressed(){
+        this.status = "Active";
+        console.log(this.floorNum + " button pressed from inside the cage");
+        cageManager.requestFloor(this.cage, this.floorNum);
+    }
+}
+
+
+////////////
+// Floors //
+////////////
+class Floor{
+    constructor(number, buttons){
+        this.number = number;
+        this.buttons = buttons;
     }
 }
