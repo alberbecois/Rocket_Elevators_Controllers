@@ -145,7 +145,7 @@ class CallButton{
 
     // Methods //
     requestPickup(direction, column, floor){
-        cage = cageManager.getAvailableCage(direction, column, floor);
+        var cage = cageManager.getAvailableCage(direction, column, floor);
         cageManager.requestElevator(cage, floor);
     }
 
@@ -231,7 +231,7 @@ class CageManager{
     }
 
     requestElevator(cage, floor){
-        cage.requests.push(request = new Request("Pending", floor));
+        cage.requests.push(new Request("Pending", floor));
         console.log("Floor " + cage.requests[cage.requests.length-1].floor + " added to request list.");
         if(cage.direction === "Up"){
             // Sort ascending
@@ -241,7 +241,7 @@ class CageManager{
     }
 
     requestFloor(cage, floor){
-        cage.requests.push(request = new Request("Pending", floor));
+        cage.requests.push(new Request("Pending", floor));
         console.log("Floor " + cage.requests[cage.requests.length-1].floor + " added to request list.");
         if(cage.direction === "Up"){
             // Sort ascending
@@ -333,6 +333,101 @@ function initialize(){
         console.log("cages_per_column = " + cages_per_column);
         console.log("total_floors = " + total_floors);
     }
+    else {
+        console.log("Startup aborted!");
+        return;
+    }
+
+    // Instantiate the CageManager
+    cageManager = new CageManager();
+    console.log("\nBeginning CageManager setup...\n \n---COLUMNS AND CAGES---");
+
+    // Instantiate FloorButtons
+    function instantiateFloorButtons(cage){
+        var buttonList = [];
+        for(var x = 0; x < total_floors; x++){
+            buttonList.push(new FloorButton(cage, x));
+        }
+        return buttonList;
+    }
+
+    // Insert Cages into Columns
+    function instantiateCages(){
+        var listCages = [];
+        for(var x = 0; x < cages_per_column; x++){
+            listCages.push(new Cage(x, "Idle", "Closed"));
+        }
+        return listCages
+    }
+
+    // Insert columns into CageManager
+    for(var x = 0; x < total_columns; x++){
+        cageManager.col_list.push(new Column("Active", instantiateCages()));
+        console.log("Column " + x + " is " + cageManager.col_list[x].status);
+    }
+
+    // Insert FloorButtons into Cages
+    for(var x = 0; x < cageManager.col_list.length; x++){
+        for(var i = 0; i < cageManager.col_list[x].cages.length; i++){
+            var curCage = cageManager.col_list[x].cages[i];
+            curCage.floorButtons = instantiateFloorButtons(curCage);
+        }
+    }
+        
+    // Confirm Cage status
+    cageManager.getCageStatus();
+
+    // Insert CallButtons into Floor
+    function instantiateCallButtons(floor, column){
+        var listButtons = [];
+        listButtons.push(new CallButton("Up", column, floor));
+        listButtons.push(new CallButton("Down", column, floor));
+        return listButtons;
+    }
+    
+    // Generate Floors and Call Buttons
+    console.log("\n---FLOORS---");
+    for(var x = 0; x < total_columns; x++){
+        for(var i = 0; i < total_floors; i++){
+            floorList.push(new Floor(i, instantiateCallButtons(i, x)));
+            console.log("Floor " + floorList[i].number + " is initialized");
+        }
+    }
+    
+    // Confirm Button status
+    console.log("\n---CALL BUTTONS---");
+    for(var x = 0; x < floorList.length; x++){
+        for(var i = 0; i < floorList[x].buttons; i++){
+            console.log(floorList[x].buttons[i].column + "-" + floorList[x].buttons[i].floor + " " + floorList[x].buttons[i].direction + " button is ready and " + floorList[x].buttons[j].status);
+        }
+    }
 }
 
-initialize();
+///////////////
+// Scenarios //
+///////////////
+function demo(){
+    console.log("\nFor demonstration purposes only...\n");
+    floorList[5].buttons[0].callButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.col_list[0].cages[0].floorButtons[1].floorButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+}
+
+
+//////////
+// Main //
+//////////
+function main(){
+    initialize();
+    
+    if(battery_on){
+        demo();
+    }
+    else {
+        console.log("Exiting program");
+    }
+}
+
+main();
