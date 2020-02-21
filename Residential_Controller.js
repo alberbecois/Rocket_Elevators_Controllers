@@ -18,6 +18,13 @@ let cages_per_column = null;
 let total_floors = null;
 let cageManager = null;
 let floorList = [];
+function Sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+    currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+};
 
 
 /////////////
@@ -43,30 +50,59 @@ class Cage{
         this.requests = [];
         this.curFloor = 0;
         this.direction = "Up";
-        this.timer = 0;
         this.door_sensor_status = "Clear";
+        this.closeButtonCheck = false;
     }
 
-    // Door Methods //
     openDoors(){
         if(this.status === "Loading"){
             this.doors = "Open";
             console.log("Cage doors are open for 8 seconds");
-            this.timer = 8;
             for(var x = 0; x < floorList[this.curFloor].buttons; x++){
                 x.status = "Inactive";
             }
             for(var x = 0; x < this.floorButtons; x++){
                 x.status = "Inactive";
             }
-            var doorTimer = function(){
-                if(this.timer === 0){
-                    return;
-                }else {
-                    console.log("Closing in " + this.timer + " seconds");
-                    this.timer -= 1;
-                    setTimeout(doorTimer, 1000);
-                }
+            console.log("Doors closing in 8 seconds");
+            Sleep(1000);
+            console.log("Doors closing in 7 seconds");
+            Sleep(1000);
+            console.log("Doors closing in 6 seconds");
+            Sleep(1000);
+            console.log("Doors closing in 5 seconds");
+            Sleep(1000);
+            if(!this.closeButtonCheck){
+                console.log("Doors closing in 4 seconds");
+                Sleep(1000);
+            }else {
+                this.closeDoors();
+                this.closeButtonCheck = false;
+                return;
+            }
+            if(!this.closeButtonCheck){
+                console.log("Doors closing in 3 seconds");
+                Sleep(1000);
+            }else {
+                this.closeDoors();
+                this.closeButtonCheck = false;
+                return;
+            }
+            if(!this.closeButtonCheck){
+                console.log("Doors closing in 2 seconds");
+                Sleep(1000);
+            }else {
+                this.closeDoors();
+                this.closeButtonCheck = false;
+                return;
+            }
+            if(!this.closeButtonCheck){
+                console.log("Doors closing in 1 seconds");
+                Sleep(1000);
+            }else {
+                this.closeDoors();
+                this.closeButtonCheck = false;
+                return;
             }
             this.closeDoors();
         }
@@ -79,7 +115,7 @@ class Cage{
     }
 
     closeDoors(){
-        if(this.door_sensor_status === "Clear" && this.timer < 5){
+        if(this.door_sensor_status === "Clear"){
             this.doors = "Closed";
             console.log("Cage doors are closed");
             this.status = "Loading";
@@ -87,9 +123,8 @@ class Cage{
     }
 
     closeButtonPressed(){
-        if(this.timer < 5){
-            this.closeDoors();
-        }
+        this.closeButtonCheck = true;
+        console.log("Close button pressed");
     }
 
     // Movement //
@@ -252,8 +287,8 @@ class CageManager{
 
     dispatchElevators(){
         for(var x = 0; x < this.col_list.length; x++){
-            for(var i = 0; i < this.col_list[x].cages[i]; i++){
-                var curCage = this.col_list[x].cages[j];
+            for(var i = 0; i < this.col_list[x].cages.length; i++){
+                var curCage = this.col_list[x].cages[i];
                 while(curCage.requests.length != 0){
                     for(var j = 0; j < curCage.requests.length; j++){
                         if(curCage.requests[j].status === "Pending"){
@@ -276,7 +311,7 @@ class CageManager{
     // Reports //
     getCageStatus(){
         for(var x = 0; x < this.col_list.length; x++){
-            for(var i = 0; i < this.col_list[x].cages; i++){
+            for(var i = 0; i < this.col_list[x].cages.length; i++){
                 console.log("Column " + x + ": Cage " + i + " is " + this.col_list[x].cages[i].status);
                 console.log("Current floor: " + this.col_list[x].cages[i].curFloor + " Door status: " + this.col_list[x].cages[i].doors);
             }
@@ -397,8 +432,8 @@ function initialize(){
     // Confirm Button status
     console.log("\n---CALL BUTTONS---");
     for(var x = 0; x < floorList.length; x++){
-        for(var i = 0; i < floorList[x].buttons; i++){
-            console.log(floorList[x].buttons[i].column + "-" + floorList[x].buttons[i].floor + " " + floorList[x].buttons[i].direction + " button is ready and " + floorList[x].buttons[j].status);
+        for(var i = 0; i < floorList[x].buttons.length; i++){
+            console.log(floorList[x].buttons[i].column + "-" + floorList[x].buttons[i].floor + " " + floorList[x].buttons[i].direction + " button is ready and " + floorList[x].buttons[i].status);
         }
     }
 }
@@ -431,3 +466,4 @@ function main(){
 }
 
 main();
+
