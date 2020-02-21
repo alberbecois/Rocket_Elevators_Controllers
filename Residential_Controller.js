@@ -248,18 +248,28 @@ class CageManager{
     getAvailableCage(direction, column, reqFloor){
         for(var x = 0; x < this.col_list[column].cages.length; x++){
             var cage = this.col_list[column].cages[x];
-            if(cage.direction === direction && direction === "Up" && cage.curFloor < reqFloor){
+            if(cage.direction === direction && direction === "Up" && cage.curFloor < reqFloor && (cage.status === "In-Service" || cage.status === "Loading")){
                 return cage; // Going same direction (UP) before requested floor
-            }else if(cage.direction === direction && direction === "Down" && cage.curFloor > reqFloor){
+            }else if(cage.direction === direction && direction === "Down" && cage.curFloor > reqFloor && (cage.status === "In-Service" || cage.status === "Loading")){
                 return cage; // Going same direction (DOWN) before requested floor
             }else if(cage.status === "Idle"){
-                return cage; // Return an unoccupied cage
+                for(var i = 0; x < this.col_list[column].cages.length; i++){
+                    if(cage != this.col_list[column].cages.length[i] && this.col_list[column].cages[i].status === "Idle"){
+                        let compareCage = this.col_list[column].cages[i];
+                        let gapA = Math.abs(cage.curFloor - reqFloor);
+                        let gapB = Math.abs(compareCage.curFloor - reqFloor);
+                        if(gapB < gapA){
+                            cage = compareCage;
+                        }
+                    }
+                }
+                return cage; // Closest idle cage
             }else {
                 for(var i = 0; i < this.col_list[column].cages; i++){
-                    if(this.col_list[column].cages[i].requests.length < cage.requests.length){ //Return least busy cage
+                    if(this.col_list[column].cages[i].requests.length < cage.requests.length){ 
                         cage = this.col_list[column].cages[i];
                     }
-                    return cage;
+                    return cage; //Return least busy cage
                 }
             }
         }
