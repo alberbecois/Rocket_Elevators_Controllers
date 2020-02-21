@@ -377,9 +377,6 @@ def scenario2():
     cageManager.dispatchElevators()
     cageManager.getCageStatus()
 
-def scenario3():
-    print("Coming soon..")
-
 def demo():
     global aScenarioHasBeenRun
     print("\nFor demonstration purposes only...\n")
