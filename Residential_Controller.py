@@ -77,28 +77,26 @@ class Cage:
     def moveDown(self, requestedFloor):
         if self.doors != "Closed":
             self.closeDoors()
-        else:
-            self.status = "In-Service"
-            self.direction = "Down"
-            while self.curFloor != requestedFloor:
-                print("Cage at " + str(self.curFloor))
-                self.curFloor -= 1
+        self.status = "In-Service"
+        self.direction = "Down"
+        while self.curFloor != requestedFloor:
             print("Cage at " + str(self.curFloor))
-            self.status = "Loading"
-            self.openDoors()
+            self.curFloor -= 1
+        print("Cage at " + str(self.curFloor))
+        self.status = "Loading"
+        self.openDoors()
     
     def moveUp(self, requestedFloor):
         if self.doors != "Closed":
             self.closeDoors()
-        else:
-            self.status = "In-Service"
-            self.direction = "Up"
-            while self.curFloor != requestedFloor:
-                print("Cage at " + str(self.curFloor))
-                self.curFloor += 1
+        self.status = "In-Service"
+        self.direction = "Up"
+        while self.curFloor != requestedFloor:
             print("Cage at " + str(self.curFloor))
-            self.status = "Loading"
-            self.openDoors()
+            self.curFloor += 1
+        print("Cage at " + str(self.curFloor))
+        self.status = "Loading"
+        self.openDoors()
     
     ## Reports ##
     def getFloorButtonStatus(self):
