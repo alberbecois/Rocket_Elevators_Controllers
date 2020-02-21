@@ -34,7 +34,8 @@ class Column {
 // Cages //
 ///////////
 class Cage{
-    constructor(status, doors){
+    constructor(id, status, doors){
+        this.id = id;
         this.status = status;
         this.doors = doors;
         this.floorButtons = [];
@@ -92,13 +93,15 @@ class Cage{
 
     // Movement //
     moveDown(requestedFloor){
-        if(this.doors != "Closed"){
+        while(this.doors != "Closed"){
             this.closeDoors();
         }
         this.status = "In-Service";
         this.direction = "Down";
         while(this.curFloor != requestedFloor){
-            console.log("Cage at");
+            console.log("Cage " + this.id + " going down at " + this.curFloor);
+            this.curFloor -= 1;
         }
+
     }
 }

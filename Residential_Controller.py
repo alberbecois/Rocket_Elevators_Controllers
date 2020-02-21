@@ -65,7 +65,7 @@ class Cage:
             self.openDoors()
 
     def closeDoors(self):
-        if self.door_sensor_status == "Clear":
+        if self.door_sensor_status == "Clear" and self.timer < 5:
             self.doors = "Closed"
             print("Cage doors are closed")
             self.status = "Loading"
@@ -76,7 +76,7 @@ class Cage:
 
     ## Movement ##
     def moveDown(self, requestedFloor):
-        if self.doors != "Closed":
+        while self.doors != "Closed":
             self.closeDoors()
         self.status = "In-Service"
         self.direction = "Down"
@@ -88,7 +88,7 @@ class Cage:
         self.openDoors()
     
     def moveUp(self, requestedFloor):
-        if self.doors != "Closed":
+        while self.doors != "Closed":
             self.closeDoors()
         self.status = "In-Service"
         self.direction = "Up"
