@@ -289,5 +289,50 @@ class CageManager{
 // Initialization //
 ////////////////////
 function initialize(){
-    
+    // Turn on the battery
+    var startup = prompt("Activate battery? (y/n): ");
+    if(startup === "y"){
+        console.log("Initializing...");
+        battery_on = true;
+        
+        // Set total columns
+        var total_columns_check = false;
+        while(!total_columns_check){
+            if(total_columns === null || isNaN(total_columns)){
+                total_columns = prompt("Enter the total number of columns: ");
+            }
+            else {
+                total_columns_check = true;
+            }
+        }
+        // Set cages per column
+        var cages_per_column_check = false;
+        while(!cages_per_column_check){
+            if(cages_per_column === null || isNaN(cages_per_column)){
+                cages_per_column = prompt("How many cages are installed per column?: ");
+            }
+            else {
+                cages_per_column_check = true;
+            }
+        }
+        // Set number of floors
+        var total_floors_check = false;
+        while(!total_floors_check){
+            if(total_floors === null || isNaN(total_floors)){
+                total_floors = prompt("How many floors are there in the building?: ");
+            }
+            else {
+                total_floors_check = true;
+            }
+        }
+
+        // Confirm setup conditions
+        console.log("\n---HARDWARE SIMULATION---");
+        console.log("battery_on = " + battery_on);
+        console.log("total_columns = " + total_columns);
+        console.log("cages_per_column = " + cages_per_column);
+        console.log("total_floors = " + total_floors);
+    }
 }
+
+initialize();

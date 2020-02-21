@@ -232,6 +232,7 @@ def initialize():
         print("Initializing...")
         global battery_on
         battery_on = True
+        
         # Set total columns
         while True:
             try:
@@ -240,6 +241,7 @@ def initialize():
                 break
             except ValueError:
                 print("Please enter a valid number")
+        # Set cages per column
         while True:
             try:
                 global cages_per_column
@@ -247,6 +249,7 @@ def initialize():
                 break
             except ValueError:
                 print("Please enter a valid number")
+        # Set number of floors
         while True:
             try:
                 global total_floors
@@ -254,6 +257,7 @@ def initialize():
                 break
             except ValueError:
                 print("Please enter a valid number")
+        
         # Confirm setup conditions
         print("\n---HARDWARE SIMULATION---")
         print("battery_on = ", battery_on)
