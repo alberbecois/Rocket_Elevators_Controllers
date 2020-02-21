@@ -180,4 +180,114 @@ class Floor{
         this.number = number;
         this.buttons = buttons;
     }
+
+    // Reports //
+    getCallButtonStatus(){
+        for(var x = 0; x < this.buttons.length; x++){
+            console.log(this.buttons[x].direction + " button is " + this.buttons[x].status);
+        }
+    }
+}
+
+
+//////////////
+// Requests //
+//////////////
+class Request{
+    constructor(status, floor){
+        this.status = status;
+        this.floor = floor;
+    }
+}
+
+
+//////////////////
+// Cage Manager //
+//////////////////
+class CageManager{
+    constructor(){
+        this.col_list = [];
+    }
+
+    // Methods //
+    getAvailableCage(direction, column, reqFloor){
+        for(var x = 0; x < this.col_list[column].cages.length; x++){
+            var cage = this.col_list[column].cages[x];
+            if(cage.direction === direction && direction === "Up" && cage.curFloor < reqFloor){
+                return cage; // Going same direction (UP) before requested floor
+            }else if(cage.direction === direction && direction === "Down" && cage.curFloor > reqFloor){
+                return cage; // Going same direction (DOWN) before requested floor
+            }else if(cage.status === "Idle"){
+                return cage; // Return an unoccupied cage
+            }else {
+                for(var i = 0; i < this.col_list[column].cages; i++){
+                    if(this.col_list[column].cages[i].requests.length < cage.requests.length){ //Return least busy cage
+                        cage = this.col_list[column].cages[i];
+                    }
+                    return cage;
+                }
+            }
+        }
+    }
+
+    requestElevator(cage, floor){
+        cage.requests.push(request = new Request("Pending", floor));
+        console.log("Floor " + cage.requests[cage.requests.length-1].floor + " added to request list.");
+        if(cage.direction === "Up"){
+            // Sort ascending
+        }else {
+            // Sort descending
+        }
+    }
+
+    requestFloor(cage, floor){
+        cage.requests.push(request = new Request("Pending", floor));
+        console.log("Floor " + cage.requests[cage.requests.length-1].floor + " added to request list.");
+        if(cage.direction === "Up"){
+            // Sort ascending
+        }else {
+            // Sort descending
+        }
+    }
+
+    dispatchElevators(){
+        for(var x = 0; x < this.col_list.length; x++){
+            for(var i = 0; i < this.col_list[x].cages[i]; i++){
+                var curCage = this.col_list[x].cages[j];
+                while(curCage.requests.length != 0){
+                    for(var j = 0; j < curCage.requests.length; j++){
+                        if(curCage.requests[j].status === "Pending"){
+                            if(curCage.requests[j].floor > curCage.curFloor){
+                                curCage.moveUp(curCage.requests[j].floor);
+                            }
+                            else {
+                                curCage.moveDown(curCage.requests[j].floor);
+                            }
+                            curCage.requests[j].status = "Completed";
+                        }
+                        curCage.requests = [];
+                        curCage.status = "Idle";
+                    }
+                }
+            }
+        }
+    }
+
+    // Reports //
+    getCageStatus(){
+        for(var x = 0; x < this.col_list.length; x++){
+            for(var i = 0; i < this.col_list[x].cages; i++){
+                console.log("Column " + x + ": Cage " + i + " is " + this.col_list[x].cages[i].status);
+                console.log("Current floor: " + this.col_list[x].cages[i].curFloor + " Door status: " + this.col_list[x].cages[i].doors);
+            }
+        }
+    }
+}
+
+
+////////////////////
+// Initialization //
+////////////////////
+function initialize(){
+    
 }
