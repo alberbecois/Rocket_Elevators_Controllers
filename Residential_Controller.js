@@ -265,13 +265,26 @@ class CageManager{
         }
     }
 
+    compare(a, b){
+        const rqstA = a.floor;
+        const rqstB = b.floor;
+
+        let comparison = 0;
+        if(rqstA > rqstB){
+            comparison = 1;
+        }else if(rqstA < rqstB){
+            comparison = -1;
+        }
+        return comparison
+    }
+
     requestElevator(cage, floor){
         cage.requests.push(new Request("Pending", floor));
         console.log("Floor " + cage.requests[cage.requests.length-1].floor + " added to request list.");
         if(cage.direction === "Up"){
-            // Sort ascending
+            cage.requests.sort(this.compare);
         }else {
-            // Sort descending
+            cage.requests.sort(this.compare * -1);
         }
     }
 
@@ -279,9 +292,9 @@ class CageManager{
         cage.requests.push(new Request("Pending", floor));
         console.log("Floor " + cage.requests[cage.requests.length-1].floor + " added to request list.");
         if(cage.direction === "Up"){
-            // Sort ascending
+            cage.requests.sort(this.compare);
         }else {
-            // Sort descending
+            cage.requests.sort(this.compare * -1);
         }
     }
 
