@@ -33,7 +33,8 @@ class Column:
 ## Cages ##
 ###########
 class Cage:
-    def __init__(self, status, doors):
+    def __init__(self, id, status, doors):
+        self.id = id
         self.status = status
         self.doors = doors
         self.floorButtons = []
@@ -81,9 +82,9 @@ class Cage:
             self.status = "In-Service"
             self.direction = "Down"
             while self.curFloor != requestedFloor:
-                print("Cage at " + str(self.curFloor))
+                print("Cage " + str(self.id) + " going down at " + str(self.curFloor))
                 self.curFloor -= 1
-            print("Cage at " + str(self.curFloor))
+            print("Cage " + str(self.id) + " at " + str(self.curFloor))
             self.status = "Loading"
             self.openDoors()
     
@@ -94,9 +95,9 @@ class Cage:
             self.status = "In-Service"
             self.direction = "Up"
             while self.curFloor != requestedFloor:
-                print("Cage at " + str(self.curFloor))
+                print("Cage " + str(self.id) + " going up at " + str(self.curFloor))
                 self.curFloor += 1
-            print("Cage at " + str(self.curFloor))
+            print("Cage " + str(self.id) + " at " + str(self.curFloor))
             self.status = "Loading"
             self.openDoors()
     
@@ -282,7 +283,7 @@ def initialize():
     def instantiateCages():
         listCages = []
         for i in range(0, cages_per_column):
-            listCages.append(Cage("Idle", "Closed"))
+            listCages.append(Cage(i, "Idle", "Closed"))
         return listCages
 
     # Insert columns into CageManager
