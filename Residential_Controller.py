@@ -19,6 +19,8 @@ cages_per_column = None
 total_floors = None
 cageManager = None
 floorList = []
+selection = None
+aScenarioHasBeenRun = False
 
 #############
 ## Columns ##
@@ -171,18 +173,31 @@ class CageManager:
     ## Methods ##
     def getAvailableCage(self, direction, column, reqFloor):
         for i in range(0, len(self.col_list[column].cages)):
-            if self.col_list[column].cages[i].direction == direction and direction == "Up" and self.col_list[column].cages[i].curFloor < reqFloor:
-                return self.col_list[column].cages[i] # Going same direction (UP) before requested floor
-            elif self.col_list[column].cages[i].direction == direction and direction == "Down" and self.col_list[column].cages[i].curFloor > reqFloor:
-                return self.col_list[column].cages[i] # Going same direction (DOWN) before requested floor
-            elif self.col_list[column].cages[i].status == "Idle":
-                return self.col_list[column].cages[i] # Return an unoccupied cage
+            cage = self.col_list[column].cages[i]
+            if cage.direction == direction and direction == "Up" and cage.curFloor < reqFloor and (cage.status == "In-Service" or cage.status == "Loading"):
+                # (for debugging) print("Same direction UP was selected")
+                return cage # Going same direction (UP) before requested floor
+            elif cage.direction == direction and direction == "Down" and cage.curFloor > reqFloor and (cage.status == "In-Service" or cage.status == "Loading"):
+                # (for debugging) print("Same direction DOWN was selected")
+                return cage # Going same direction (DOWN) before requested floor
+            elif cage.status == "Idle":
+                for j in range(0, len(self.col_list[column].cages)):
+                    if cage != self.col_list[column].cages[j] and self.col_list[column].cages[j].status == "Idle":
+                        compareCage = self.col_list[column].cages[j]
+                        # (for debugging) print(str(cage.id) + " to be compared to")
+                        # (for debugging) print(str(compareCage.id))
+                        gapA = abs(cage.curFloor - reqFloor)
+                        gapB = abs(compareCage.curFloor - reqFloor)
+                        if gapB < gapA:
+                            cage = compareCage
+                # (for debugging) print(str(cage.id) + " is selected")
+                return cage # Closest idle cage
             else:
-                cage = self.col_list[column].cages[i] # Return the least busy cage
                 for j in range(0, len(self.col_list[column].cages)):
                     if len(self.col_list[column].cages[j].requests) < len(cage.requests):
                         cage = self.col_list[column].cages[j]
-                return cage
+                print("Least occupied cage is selected")
+                return cage # Least occupied cage
     
     def requestElevator(self, cage, floor):
         cage.requests.append(Request("Pending", floor))
@@ -326,14 +341,75 @@ def initialize():
 ###############
 ## Scenarios ##
 ###############
-def demo():
-    print("\nFor demonstration purposes only...\n")
-    floorList[5].buttons[0].callButtonPressed()
+def scenario1():
+    cageManager.col_list[0].cages[0].curFloor = 1
+    cageManager.col_list[0].cages[1].curFloor = 5
+    cageManager.getCageStatus()
+    floorList[2].buttons[0].callButtonPressed()
     cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+    cageManager.col_list[0].cages[0].floorButtons[6].floorButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+
+def scenario2():
+    cageManager.col_list[0].cages[0].curFloor = 9
+    cageManager.col_list[0].cages[1].curFloor = 2
+    cageManager.getCageStatus()
+    floorList[0].buttons[0].callButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+    cageManager.col_list[0].cages[1].floorButtons[5].floorButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+    print("2 mins later... ")
+    floorList[2].buttons[0].callButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+    cageManager.col_list[0].cages[1].floorButtons[4].floorButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
+    print("Another 2 mins later...")
+    floorList[8].buttons[1].callButtonPressed()
+    cageManager.dispatchElevators()
+    cageManager.getCageStatus()
     cageManager.col_list[0].cages[0].floorButtons[1].floorButtonPressed()
     cageManager.dispatchElevators()
     cageManager.getCageStatus()
 
+def scenario3():
+    print("Coming soon..")
+
+def demo():
+    global aScenarioHasBeenRun
+    print("\nFor demonstration purposes only...\n")
+    # Scenario Selection:
+    def getSelection():
+        while True:
+            global selection
+            try:
+                selection = int(input("Please select a demo scenario (1, 2): "))
+                break
+            except ValueError:
+                print("Please enter a valid number")
+    
+    getSelection()
+    
+    def runScenario():
+        global aScenarioHasBeenRun
+        if selection == 1:
+            scenario1()
+            aScenarioHasBeenRun = True
+        elif selection == 2:
+            scenario2()
+            aScenarioHasBeenRun = True
+        else:
+            print("Invalid selection! -- Only values 1 or 2 are permitted.")
+            getSelection()
+
+    while aScenarioHasBeenRun == False:
+        runScenario()
+    
 
 ##########
 ## Main ##
