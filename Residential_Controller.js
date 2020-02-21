@@ -18,6 +18,8 @@ let cages_per_column = null;
 let total_floors = null;
 let cageManager = null;
 let floorList = [];
+let aScenarioHasBeenRun = false;
+let selection = null;
 function Sleep(milliseconds) {
     const date = Date.now();
     let currentDate = null;
@@ -464,13 +466,78 @@ function initialize(){
 ///////////////
 // Scenarios //
 ///////////////
-function demo(){
-    console.log("\nFor demonstration purposes only...\n");
-    floorList[5].buttons[0].callButtonPressed();
+function scenario1(){
+    cageManager.col_list[0].cages[0].curFloor = 1;
+    cageManager.col_list[0].cages[1].curFloor = 5;
+    cageManager.getCageStatus();
+    floorList[2].buttons[0].callButtonPressed();
     cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+    cageManager.col_list[0].cages[0].floorButtons[6].floorButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+}
+
+function scenario2(){
+    cageManager.col_list[0].cages[0].curFloor = 9;
+    cageManager.col_list[0].cages[1].curFloor = 2;
+    cageManager.getCageStatus();
+    floorList[0].buttons[0].callButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+    cageManager.col_list[0].cages[1].floorButtons[5].floorButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+    console.log("2 mins later... ");
+    floorList[2].buttons[0].callButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+    cageManager.col_list[0].cages[1].floorButtons[4].floorButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
+    console.log("Another 2 mins later...");
+    floorList[8].buttons[1].callButtonPressed();
+    cageManager.dispatchElevators();
+    cageManager.getCageStatus();
     cageManager.col_list[0].cages[0].floorButtons[1].floorButtonPressed();
     cageManager.dispatchElevators();
     cageManager.getCageStatus();
+}
+
+function demo(){
+    console.log("\nFor demonstration purposes only...\n");
+    // Scenario Selection //
+    function getSelection(){
+        var selectioncheck = false;
+        while(!selectioncheck){
+            if(selection === null || isNaN(Selection)){
+                selection = prompt("Please select a demo scenario (1, 2): ");
+            }
+            else {
+                selectioncheck = true;
+            }
+        }
+    }
+
+    getSelection();
+
+    function runScenario(){
+        if(selection === 1){
+            scenario1();
+            aScenarioHasBeenRun = true;
+        }else if(selection === 2){
+            scenario2();
+            aScenarioHasBeenRun = true;
+        }else {
+            console.log("Invalid selection! -- Only values 1 or 2 are permitted.");
+            selection = null;
+            getSelection();
+        }
+    }
+
+    while(!aScenarioHasBeenRun){
+        runScenario();
+    }
 }
 
 
