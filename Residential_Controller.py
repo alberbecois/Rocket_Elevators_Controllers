@@ -4,7 +4,7 @@
 ## Author: {Joshua Knutson}                          ##
 ## License: {GNUGPLv3}                               ##
 ## Link: {https://www.gnu.org/licenses/gpl-3.0.html} ##
-## Version: {1.00}                                   ##
+## Version: {0.01}                                   ##
 ## Contact: {github.com/alberbecois}                 ##
 #######################################################
 
@@ -380,7 +380,7 @@ def scenario2():
 def demo():
     global aScenarioHasBeenRun
     print("\nFor demonstration purposes only...\n")
-    # Scenario Selection:
+    # Scenario Selection: #
     def getSelection():
         while True:
             global selection
