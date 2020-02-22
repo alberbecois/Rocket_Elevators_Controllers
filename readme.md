@@ -62,3 +62,12 @@ Can be called at anytime from a floor object to get the status of all call butto
 getFloorButtonStatus()
 ```
 Can be called at anytime from a cage object to get the status of all floor buttons in that cage.
+
+## Notes
+### Version Notes
+
+1.00 - Launches support for Python and JavaScript
+
+### JavaScript
+
+It should be noted that as the prompt() function is used to get input for this version, it must be used in a REPL environment. Regular Node environments require a readline method.
