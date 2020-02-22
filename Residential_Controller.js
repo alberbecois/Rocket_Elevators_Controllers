@@ -4,7 +4,7 @@
 // Author: {Joshua Knutson}                          //
 // License: {GNUGPLv3}                               //
 // Link: {https://www.gnu.org/licenses/gpl-3.0.html} //
-// Version: {0.01}                                   //
+// Version: {1.00}                                   //
 // Contact: {github.com/alberbecois}                 //
 ///////////////////////////////////////////////////////
 
