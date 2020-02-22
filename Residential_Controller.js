@@ -255,7 +255,7 @@ class CageManager{
             }else if(cage.direction === direction && direction === "Down" && cage.curFloor > reqFloor && (cage.status === "In-Service" || cage.status === "Loading")){
                 return cage; // Going same direction (DOWN) before requested floor
             }else if(cage.status === "Idle"){
-                for(var i = 0; x < this.col_list[column].cages.length; i++){
+                for(var i = 0; i < this.col_list[column].cages.length; i++){
                     if(cage != this.col_list[column].cages.length[i] && this.col_list[column].cages[i].status === "Idle"){
                         let compareCage = this.col_list[column].cages[i];
                         let gapA = Math.abs(cage.curFloor - reqFloor);
@@ -306,7 +306,7 @@ class CageManager{
         if(cage.direction === "Up"){
             cage.requests.sort(this.compare);
         }else {
-            cage.requests.sort(this.compare * -1);
+            cage.requests.sort(this.compare);
         }
     }
 
@@ -510,7 +510,7 @@ function demo(){
     function getSelection(){
         var selectioncheck = false;
         while(!selectioncheck){
-            if(selection === null || isNaN(Selection)){
+            if(selection === null || isNaN(selection)){
                 selection = prompt("Please select a demo scenario (1, 2): ");
             }
             else {
@@ -522,10 +522,10 @@ function demo(){
     getSelection();
 
     function runScenario(){
-        if(selection === 1){
+        if(selection == 1){
             scenario1();
             aScenarioHasBeenRun = true;
-        }else if(selection === 2){
+        }else if(selection == 2){
             scenario2();
             aScenarioHasBeenRun = true;
         }else {
