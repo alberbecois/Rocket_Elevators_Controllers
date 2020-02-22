@@ -277,7 +277,7 @@ class CageManager{
         }
     }
 
-    compare(a, b){
+    compare(a, b, desc = false){
         const rqstA = a.floor;
         const rqstB = b.floor;
 
@@ -287,7 +287,7 @@ class CageManager{
         }else if(rqstA < rqstB){
             comparison = -1;
         }
-        return comparison
+        return desc ? comparison * -1 : comparison
     }
 
     requestElevator(cage, floor){
@@ -296,7 +296,7 @@ class CageManager{
         if(cage.direction === "Up"){
             cage.requests.sort(this.compare);
         }else {
-            cage.requests.sort(this.compare * -1);
+            cage.requests.sort((a, b) => this.compare(a, b, true));
         }
     }
 
