@@ -10,13 +10,29 @@
 
 using System;
 
-namespace Commercial_Controller_CSharp
+//////////////////
+// Cage Manager //
+//////////////////
+static class CageManager{
+    public static bool battery_on {get; set;}
+    public static int total_columns {get; set;}
+    public static int cages_per_column {get; set;}
+    public static int total_floors {get; set;}
+
+    
+}
+
+////////////////////
+// Initialization //
+////////////////////
+
+class Program
 {
-    class Commercial_Controller
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
+        Console.WriteLine("Hello World!");
     }
 }
+
+
+
