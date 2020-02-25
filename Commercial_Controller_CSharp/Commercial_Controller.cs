@@ -198,6 +198,15 @@ class Program
                 }
             }
         }
+
+        // Confirm Setup Conditions //
+        Console.WriteLine("\n---HARDWARE SIMULATION---");
+        Console.WriteLine(String.Format("\n{0, -17} {1, 8}\n", "Hardware", "Value"));
+        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Battery", "On"));
+        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Columns", userColumns));
+        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Cages Per Column", userCagesPerColumn));
+        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Floors", userFloors));
+        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Basements", userBasements));
     }
 }
 
