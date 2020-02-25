@@ -9,28 +9,59 @@
 ///////////////////////////////////////////////////////
 
 using System;
+using System.Threading;
 
 //////////////////
 // Cage Manager //
 //////////////////
-static class CageManager{
-    public static bool battery_on {get; set;}
-    public static int total_columns {get; set;}
-    public static int cages_per_column {get; set;}
-    public static int total_floors {get; set;}
-
+public class CageManager
+{
     
 }
 
-////////////////////
-// Initialization //
-////////////////////
+
+//////////////////////////
+// System Configuration //
+//////////////////////////
+public class Configuration
+{
+    public readonly bool batteryOn;
+    public readonly int totalColumns;
+    public readonly int cagesPerColumn;
+    public readonly int totalFloors;
+
+    public Configuration(bool batteryOn, int totalColumns, int cagesPerColumn, int totalFloors)
+    {
+        this.batteryOn = batteryOn;
+        this.totalColumns = totalColumns;
+        this.cagesPerColumn = cagesPerColumn;
+        this.totalFloors = totalFloors;
+    }
+}
 
 class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello World!");
+        ConsoleKeyInfo cki;
+        do {
+            Console.WriteLine("Activate battery? [y/n]");
+            while (Console.KeyAvailable == false)
+            {
+                Thread.Sleep(250); // Loop until valid input is entered.
+            }    
+            
+            cki = Console.ReadKey(true);
+            Console.WriteLine("You pressed the '{0}' key. Please make a valid selection.", cki.Key);
+            if(cki.Key == ConsoleKey.N)
+            {
+                Console.WriteLine("Startup Aborted!");
+                return;
+            }
+            } while(cki.Key != ConsoleKey.Y);
+            Console.WriteLine("Initializing...");
+            Console.WriteLine("Enter the total number of columns: ");
+            int totalColumns = Convert.ToInt32(Console.ReadLine());
     }
 }
 
