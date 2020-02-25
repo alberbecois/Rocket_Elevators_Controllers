@@ -14,6 +14,7 @@ using System.Threading;
 //////////////////
 // Cage Manager //
 //////////////////
+
 public class CageManager
 {
     
@@ -23,6 +24,7 @@ public class CageManager
 //////////////////////////
 // System Configuration //
 //////////////////////////
+
 public class Configuration
 {
     public readonly bool batteryOn;
@@ -45,6 +47,7 @@ public class Configuration
 //////////
 // Main //
 //////////
+
 class Program
 {
     static void Main(string[] args)
@@ -197,6 +200,4 @@ class Program
         }
     }
 }
-
-
 
