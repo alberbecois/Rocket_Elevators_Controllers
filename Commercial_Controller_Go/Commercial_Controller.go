@@ -11,8 +11,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 )
 
 //////////////////
@@ -34,22 +37,35 @@ type Configuration struct {
 	totalBasements int
 }
 
-func askForConfirmation() bool {
-	var response string
-	_, err := fmt.Scanln(&response)
-	if err != nil {
-		log.Fatal(err)
+func askForConfirmation(s string) bool {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf("%s [y/n]: ", s)
+
+		response, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		response = strings.ToLower(strings.TrimSpace(response))
+
+		if response == "y" || response == "yes" {
+			return true
+		} else if response == "n" || response == "no" {
+			return false
+		} else {
+			fmt.Printf(response + " is not a valid selection\n")
+		}
 	}
-	okayResponses := []string{"y", "Y", "yes", "Yes", "YES"}
-	nokayResponses := []string{"n", "N", "no", "No", "NO"}
-	if containsString(okayResponses, response) {
-		return true
-	} else if containsString(nokayResponses, response) {
-		return false
-	} else {
-		fmt.Println("Please type yes or no and then press enter:")
-		return askForConfirmation()
-	}
+}
+
+func initialize() {
+	reader := bufio.NewReader(os.Stdin)
+	var totalColumns int
+	// Set total number of columns
+	fmt.Printf("Enter the total number of columns")
+
 }
 
 //////////
@@ -57,15 +73,14 @@ func askForConfirmation() bool {
 //////////
 
 func main() {
-	fmt.Println("Hello, 世界 - お名前は？")
+	/*fmt.Println("Hello, 世界 - お名前は？")
 	var input string
 	fmt.Scanln(&input)
-	fmt.Println("Hello, " + input)
+	fmt.Println("Hello, " + input)*/
 
-	fmt.Println("Activate battery? [y/n]")
-
-	if askForConfirmation() == true {
+	if askForConfirmation("Activate battery?") == true {
 		fmt.Println("Initializing...")
+		initialize()
 	} else {
 		fmt.Println("Startup aborted!")
 	}
