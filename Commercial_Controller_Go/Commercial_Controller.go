@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////
-// {Commercial Controller}                          //
+// {Commercial Controller}                           //
 ///////////////////////////////////////////////////////
 // Author: {Joshua Knutson}                          //
 // License: {GNUGPLv3}                               //

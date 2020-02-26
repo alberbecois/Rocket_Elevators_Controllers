@@ -25,22 +25,13 @@ public class CageManager
 // System Configuration //
 //////////////////////////
 
-public class Configuration
+public static class Configuration
 {
-    public readonly bool batteryOn;
-    public readonly int totalColumns;
-    public readonly int cagesPerColumn;
-    public readonly int totalFloors;
-    public readonly int totalBasements;
-
-    public Configuration(bool batteryOn, int totalColumns, int cagesPerColumn, int totalFloors, int totalBasements)
-    {
-        this.batteryOn = batteryOn;
-        this.totalColumns = totalColumns;
-        this.cagesPerColumn = cagesPerColumn;
-        this.totalFloors = totalFloors;
-        this.totalBasements = totalBasements;
-    }
+    public static bool batteryOn;
+    public static int totalColumns;
+    public static int cagesPerColumn;
+    public static int totalFloors;
+    public static int totalBasements;
 }
 
 
