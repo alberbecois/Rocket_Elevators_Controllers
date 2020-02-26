@@ -51,6 +51,70 @@ public class Cage
         this.status = status;
         this.doors = doors;
     }
+
+    // Door Methods //
+    public void OpenDoors()
+    {
+        if (this.status == "Loading")
+        {
+            this.doors = "Open";
+            Console.WriteLine("Cage doors are open for 8 seconds");
+            this.timer = 8;
+            // TO DO - Deactivate buttons
+            while (this.timer > 0)
+            {
+                Console.WriteLine("Closing in " + this.timer + " seconds.");
+                Thread.Sleep(1000);
+                this.timer -= 1;
+            }
+            this.CloseDoors();
+        }
+    }
+
+    // Movement //
+    public void MoveDown(Floor reqFloor)
+    {
+        while (this.doors != "Closed")
+        {
+            this.CloseDoors();
+        }
+        this.status = "In-Service";
+        this.direction = "Down";
+        while (this.curFloor != reqFloor.id)
+        {
+            Console.WriteLine("Cage " + this.id + " going down at " + this.curFloor);
+            this.curFloor -= 1;
+        }
+        Console.WriteLine("Cage " + this.id + " at " + this.curFloor);
+        this.status = "Loading";
+        this.OpenDoors();
+    }
+
+    public void OpenButtonPressed()
+    {
+        if (this.status != "In-Service")
+        {
+            this.OpenDoors();
+        }
+    }
+
+    public void CloseDoors()
+    {
+        if (this.doorSensorStatus == "Clear" && this.timer < 5)
+        {
+            this.doors = "Closed";
+            Console.WriteLine("Cage doors are closed");
+            this.status = "Loading";
+        }
+    }
+
+    public void CloseButtonPressed()
+    {
+        if (this.timer < 5)
+        {
+            this.CloseDoors();
+        }
+    }
 }
 
 
@@ -121,7 +185,7 @@ public class CageManager
     // Methods //
     public Cage GetAvailableCage(string direction, int column, Floor reqFloor )
     {
-        for (int x = 0; x < this.colList[column].cages.Count; x ++)
+        for (int x = 0; x < this.colList[column].cages.Count; x++)
         {
             Cage curCage = this.colList[column].cages[x];
             if (curCage.direction == direction && direction == "Up" && curCage.curFloor < reqFloor.id && (curCage.status == "In-Service" || curCage.status == "Loading"))
@@ -134,7 +198,7 @@ public class CageManager
                 return curCage; // Going same direction (DOWN) before requested floor
             } else if (curCage.status == "Idle")
             {
-                for (int i = 0; i < this.colList[column].cages.Count; i ++)
+                for (int i = 0; i < this.colList[column].cages.Count; i++)
                 {
                     if (curCage != this.colList[column].cages[i])
                     {
@@ -152,7 +216,7 @@ public class CageManager
                 }
             } else 
             {
-                for (int i = 0; i < this.colList[column].cages.Count; i ++)
+                for (int i = 0; i < this.colList[column].cages.Count; i++)
                 {
                     if (this.colList[column].cages[i].requests.Count < curCage.requests.Count)
                     {
@@ -178,7 +242,21 @@ public class CageManager
 
     public void DispatchElevators()
     {
-        
+
+    }
+
+    // Reports //
+    public void GetCageStatus()
+    {
+        for (int x = 0; x < this.colList.Count; x++)
+        {
+            for (int i = 0; i < this.colList[x].cages.Count; i++)
+            {   
+                Cage curCage = this.colList[x].cages[i];
+                Console.WriteLine("Column " + x + ": Cage " + i + " is " + curCage.status);
+                Console.WriteLine("Current floor: " + curCage.curFloor + " Door status: " + curCage.doors);
+            }
+        }
     }
 }
 
