@@ -22,7 +22,8 @@ public class Column
     public readonly List<Cage> cages;
     public readonly List<Floor> floors;
 
-    public Column(string status, List<Cage> cages, List<Floor> floors){
+    public Column(string status, List<Cage> cages, List<Floor> floors)
+    {
         this.status = status;
         this.cages = cages;
         this.floors = floors;
@@ -38,14 +39,14 @@ public class Cage
     public readonly int id;
     public string status;
     public string doors;
-    public readonly List<FloorButton> floorButtons;
     public List<Request> requests = new List<Request>();
     public int curFloor = 1;
     public string direction = "Up";
     public int timer = 0;
     public string doorSensorStatus = "Clear";
 
-    public Cage(int id, string status, string doors){
+    public Cage(int id, string status, string doors)
+    {
         this.id = id;
         this.status = status;
         this.doors = doors;
@@ -65,6 +66,21 @@ public class CallButton
 public class FloorButton
 {
 
+}
+
+
+///////////
+// Panel //
+///////////
+
+public class Panel
+{
+    public readonly List<FloorButton> floorButtons;
+
+    public Panel(List<FloorButton> list)
+    {
+        this.floorButtons = list;
+    }
 }
 
 
@@ -111,16 +127,8 @@ public static class Configuration
     public static int cagesPerColumn;
     public static int totalFloors;
     public static int totalBasements;
-}
 
-
-//////////
-// Main //
-//////////
-
-class Program
-{
-    static void Main(string[] args)
+    public static void Config()
     {
         ConsoleKeyInfo cki;
         do {
@@ -131,8 +139,10 @@ class Program
             }    
         
             cki = Console.ReadKey(true);
-            Console.WriteLine("You pressed the '{0}' key. Please make a valid selection.", cki.Key);
-            if(cki.Key == ConsoleKey.N)
+            if(cki.Key != ConsoleKey.Y && cki.Key != ConsoleKey.N)
+            {
+                Console.WriteLine("You pressed the '{0}' key. Please make a valid selection.", cki.Key);
+            } else if(cki.Key == ConsoleKey.N)
             {
                 Console.WriteLine("Startup Aborted!");
                 return;
@@ -269,21 +279,34 @@ class Program
             }
         }
 
-        // Confirm Setup Conditions //
-        Console.WriteLine("\n-------HARDWARE SIMULATION--------");
-        Console.WriteLine(String.Format("\n{0, -17} {1, 8}\n", "Hardware", "Value"));
-        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Battery", "On"));
-        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Columns", userColumns));
-        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Cages Per Column", userCagesPerColumn));
-        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Floors", userFloors));
-        Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Basements", userBasements));
-
         // Set Configuration Values //
         Configuration.batteryOn = true;
         Configuration.totalColumns = totalColumns;
         Configuration.cagesPerColumn = cagesPerColumn;
         Configuration.totalFloors = totalFloors;
         Configuration.totalBasements = totalBasements;
+
+        // Confirm Setup Conditions //
+        Console.WriteLine("\n-------HARDWARE SIMULATION-------");
+        Console.WriteLine(String.Format("\n{0, -17} {1, 15}\n", "Hardware", "Value"));
+        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Battery", "On"));
+        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Columns", Configuration.totalColumns));
+        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Cages Per Column", Configuration.cagesPerColumn));
+        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Floors", Configuration.totalFloors));
+        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Basements", Configuration.totalBasements));
+    }
+}
+
+
+//////////
+// Main //
+//////////
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Configuration.Config();
     }
 }
 
