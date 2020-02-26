@@ -100,19 +100,19 @@ func initialize() {
 	totalBasements := takeIntInput("How many basements are there? ")
 
 	// Confirm setup conditions
-	fmt.Printf("\n-------HARDWARE SIMULATION--------\n")
+	fmt.Printf("\n-------HARDWARE SIMULATION-------\n")
 	fmt.Printf("\n%-17v", "Hardware")
-	fmt.Printf("%17v\n\n", "Value")
+	fmt.Printf("%15v\n\n", "Value")
 	fmt.Printf("%-17v", "Battery")
-	fmt.Printf("%17v\n", "On")
+	fmt.Printf("%15v\n", "On")
 	fmt.Printf("%-17v", "Total Columns")
-	fmt.Printf("%17v\n", totalColumns)
+	fmt.Printf("%15v\n", totalColumns)
 	fmt.Printf("%-17v", "Cages Per Column")
-	fmt.Printf("%17v\n", cagesPerColumn)
+	fmt.Printf("%15v\n", cagesPerColumn)
 	fmt.Printf("%-17v", "Total Floor")
-	fmt.Printf("%17v\n", totalFloors)
+	fmt.Printf("%15v\n", totalFloors)
 	fmt.Printf("%-17v", "Total Basements")
-	fmt.Printf("%17v\n", totalBasements)
+	fmt.Printf("%15v\n", totalBasements)
 }
 
 //////////
