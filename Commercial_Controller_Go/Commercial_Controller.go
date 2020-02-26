@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -60,41 +61,43 @@ func askForConfirmation(s string) bool {
 	}
 }
 
+func takeIntInput(s string) int {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf("%s: ", s)
+
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+		cleanedInput := strings.Replace(input, "\r\n", "", -1)
+		myInt, err1 := strconv.Atoi(cleanedInput)
+		if err1 != nil {
+			fmt.Printf(cleanedInput + " is not a valid number. Please enter a valid number.\n")
+		} else if myInt < 0 {
+			fmt.Printf("Value cannot be less than zero. Please enter a valid number.\n")
+		} else {
+			return myInt
+		}
+	}
+}
+
 func initialize() {
 	// Set total number of columns
-	fmt.Printf("Enter the total number of columns ")
-	var totalColumns int
-	totalColumns, err := fmt.Scanln(&totalColumns)
-	if err != nil {
-		log.Fatal(err)
-	}
+	totalColumns := takeIntInput("Enter the total number of columns")
 
 	// Set cages per column
-	fmt.Printf("How many cages are installed per column? ")
-	var cagesPerColumn int
-	cagesPerColumn, err1 := fmt.Scanln(&cagesPerColumn)
-	if err1 != nil {
-		log.Fatal(err)
-	}
+	cagesPerColumn := takeIntInput("How many cages are installed per column?")
 
 	// Set number of floors
-	fmt.Printf("How many floors (excluding basements) are there in the building? ")
-	var totalFloors int
-	totalFloors, err2 := fmt.Scanln(&totalFloors)
-	if err2 != nil {
-		log.Fatal(err)
-	}
+	totalFloors := takeIntInput("How many floors (excluding basements) are there in the building?")
 
 	// Set number of basements
-	fmt.Printf("How many basements are there? ")
-	var totalBasements int
-	totalBasements, err3 := fmt.Scanln(&totalBasements)
-	if err3 != nil {
-		log.Fatal(err)
-	}
+	totalBasements := takeIntInput("How many basements are there? ")
 
 	// Confirm setup conditions
-	fmt.Printf("\n-------HARDWARE SIMULATION-------\n")
+	fmt.Printf("\n-------HARDWARE SIMULATION--------\n")
 	fmt.Printf("\n%-17v", "Hardware")
 	fmt.Printf("%17v\n\n", "Value")
 	fmt.Printf("%-17v", "Battery")
