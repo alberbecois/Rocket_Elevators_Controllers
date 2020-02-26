@@ -196,7 +196,7 @@ class CageManager:
                 for j in range(0, len(self.col_list[column].cages)):
                     if len(self.col_list[column].cages[j].requests) < len(cage.requests):
                         cage = self.col_list[column].cages[j]
-                print("Least occupied cage is selected")
+                # (for debugging) print("Least occupied cage is selected")
                 return cage # Least occupied cage
     
     def requestElevator(self, cage, floor):
