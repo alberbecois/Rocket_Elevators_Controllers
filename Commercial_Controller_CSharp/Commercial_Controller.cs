@@ -77,9 +77,9 @@ public class Panel
 {
     public readonly List<FloorButton> floorButtons;
 
-    public Panel(List<FloorButton> list)
+    public Panel(List<FloorButton> floorButtons)
     {
-        this.floorButtons = list;
+        this.floorButtons = floorButtons;
     }
 }
 
@@ -112,7 +112,74 @@ public class Request
 
 public class CageManager
 {
-    
+    public List<Column> colList;
+    public CageManager(List<Column> colList)
+    {
+        this.colList = colList;
+    }
+
+    // Methods //
+    public Cage GetAvailableCage(string direction, int column, Floor reqFloor )
+    {
+        for (int x = 0; x < this.colList[column].cages.Count; x ++)
+        {
+            Cage curCage = this.colList[column].cages[x];
+            if (curCage.direction == direction && direction == "Up" && curCage.curFloor < reqFloor.id && (curCage.status == "In-Service" || curCage.status == "Loading"))
+            {
+                // Console.WriteLine("Same direction UP was selected"); // **For debugging**
+                return curCage; // Going same direction (UP) before requested floor
+            } else if (curCage.direction == direction && direction == "Down" && curCage.curFloor < reqFloor.id && (curCage.status == "In-Service" || curCage.status == "Loading"))
+            {
+                // Console.WriteLine("Same direction DOWN was selected"); // **For debugging**
+                return curCage; // Going same direction (DOWN) before requested floor
+            } else if (curCage.status == "Idle")
+            {
+                for (int i = 0; i < this.colList[column].cages.Count; i ++)
+                {
+                    if (curCage != this.colList[column].cages[i])
+                    {
+                        Cage compareCage = this.colList[column].cages[i];
+                        // Console.WriteLine("Cage " + curCage.id + " to be compared to " + compareCage.id); // **For debugging**
+                        int gapA = Math.Abs(curCage.curFloor - reqFloor.id);
+                        int gapB = Math.Abs(compareCage.curFloor - reqFloor.id);
+                        if (gapB < gapA)
+                        {
+                            curCage = compareCage;
+                        }
+                    }
+                    // Console.WriteLine("Cage " + curCage.id + " is selected.") // **For debugging**
+                    return curCage; // Closest idle cage
+                }
+            } else 
+            {
+                for (int i = 0; i < this.colList[column].cages.Count; i ++)
+                {
+                    if (this.colList[column].cages[i].requests.Count < curCage.requests.Count)
+                    {
+                        curCage = this.colList[column].cages[i];
+                    }
+                }
+                // Console.WriteLine("Least occupied cage is selected"); // **For debugging**
+                return curCage; // Least occupied cage
+            }
+        }
+        return null;
+    }
+
+    public void RequestElevator()
+    {
+
+    }
+
+    public void AssignElevator()
+    {
+
+    }
+
+    public void DispatchElevators()
+    {
+        
+    }
 }
 
 
