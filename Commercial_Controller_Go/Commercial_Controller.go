@@ -38,6 +38,7 @@ type Configuration struct {
 	totalBasements int
 }
 
+// Gets a y or n response from the user
 func askForConfirmation(s string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -61,6 +62,7 @@ func askForConfirmation(s string) bool {
 	}
 }
 
+// Gets positive integer values from the user
 func takeIntInput(s string) int {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -83,6 +85,7 @@ func takeIntInput(s string) int {
 	}
 }
 
+// Performs initial setup for the hardware simulation
 func initialize() {
 	// Set total number of columns
 	totalColumns := takeIntInput("Enter the total number of columns")
