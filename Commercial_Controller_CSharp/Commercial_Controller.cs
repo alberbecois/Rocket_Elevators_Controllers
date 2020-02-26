@@ -10,6 +10,85 @@
 
 using System;
 using System.Threading;
+using System.Collections.Generic;
+
+/////////////
+// Columns //
+/////////////
+
+public class Column
+{
+    public readonly string status;
+    public readonly List<Cage> cages;
+    public readonly List<Floor> floors;
+
+    public Column(string status, List<Cage> cages, List<Floor> floors){
+        this.status = status;
+        this.cages = cages;
+        this.floors = floors;
+    }
+}
+
+///////////
+// Cages //
+///////////
+
+public class Cage
+{
+    public readonly int id;
+    public string status;
+    public string doors;
+    public readonly List<FloorButton> floorButtons;
+    public List<Request> requests = new List<Request>();
+    public int curFloor = 1;
+    public string direction = "Up";
+    public int timer = 0;
+    public string doorSensorStatus = "Clear";
+
+    public Cage(int id, string status, string doors){
+        this.id = id;
+        this.status = status;
+        this.doors = doors;
+    }
+}
+
+
+/////////////
+// Buttons //
+/////////////
+
+public class CallButton
+{
+
+}
+
+public class FloorButton
+{
+
+}
+
+
+////////////
+// Floors //
+////////////
+
+public class Floor
+{
+    public readonly int id;
+    public CallButton button;
+}
+
+
+//////////////
+// Requests //
+//////////////
+
+public class Request
+{
+    public string status;
+    public Floor floor;
+}
+
 
 //////////////////
 // Cage Manager //
@@ -191,13 +270,20 @@ class Program
         }
 
         // Confirm Setup Conditions //
-        Console.WriteLine("\n-------HARDWARE SIMULATION-------");
+        Console.WriteLine("\n-------HARDWARE SIMULATION--------");
         Console.WriteLine(String.Format("\n{0, -17} {1, 8}\n", "Hardware", "Value"));
         Console.WriteLine(String.Format("{0, -17} {1, 8}", "Battery", "On"));
         Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Columns", userColumns));
         Console.WriteLine(String.Format("{0, -17} {1, 8}", "Cages Per Column", userCagesPerColumn));
         Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Floors", userFloors));
         Console.WriteLine(String.Format("{0, -17} {1, 8}", "Total Basements", userBasements));
+
+        // Set Configuration Values //
+        Configuration.batteryOn = true;
+        Configuration.totalColumns = totalColumns;
+        Configuration.cagesPerColumn = cagesPerColumn;
+        Configuration.totalFloors = totalFloors;
+        Configuration.totalBasements = totalBasements;
     }
 }
 
