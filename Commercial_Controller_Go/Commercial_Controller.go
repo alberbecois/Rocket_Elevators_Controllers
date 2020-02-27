@@ -23,6 +23,7 @@ import (
 // Cage Manager //
 //////////////////
 
+// CageManager should be instantiated once after Configuration is completed.
 type CageManager struct {
 }
 
@@ -30,6 +31,7 @@ type CageManager struct {
 // System Configuration //
 //////////////////////////
 
+// Configuration should be run once on startup to generate a hardware simulation.
 type Configuration struct {
 	batteryOn      bool
 	totalColumns   int
