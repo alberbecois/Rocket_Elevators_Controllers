@@ -133,7 +133,12 @@ public class Cage
 
 public class CallButton
 {
-    public string status = "Inactive";
+    public string status;
+
+    public CallButton(string status)
+    {
+        this.status = status;
+    }
 
     public void CallButtonPressed()
     {
@@ -175,6 +180,12 @@ public class Floor
 {
     public readonly int id;
     public CallButton button;
+
+    public Floor(int id, CallButton button)
+    {
+        this.id = id;
+        this.button = button;
+    }
 }
 
 
@@ -297,6 +308,8 @@ public class CageManager
 // System Configuration //
 //////////////////////////
 
+// This static object generates a hardware configuration from user input and    //
+// the corresponding floor list.                                                //
 public static class Configuration
 {
     public static bool batteryOn;
@@ -305,6 +318,45 @@ public static class Configuration
     public static int totalFloors;
     public static int totalBasements;
 
+    public static List<Floor> floorList = new List<Floor>();
+
+    // Gets integer value from the user - takes a user prompt and minimum value //
+    //          ---IMPORTANT: minValue should never be less than 0---           //
+    public static int GetIntInput(string prompt, int minValue)
+    {
+        Console.WriteLine(prompt);
+        int myInt = -1;
+        string userInt = Console.ReadLine();
+        while(myInt == -1)
+        {
+            try
+            {
+                myInt = Convert.ToInt32(userInt);
+                if(myInt < minValue)
+                {
+                    Console.WriteLine("Value cannot be less than " + minValue + ".");
+                    myInt = -1;
+                    userInt = "";
+                }
+            }
+            catch(System.FormatException)
+            {
+                if(userInt == "")
+                {
+                    Console.WriteLine("Please enter a valid number.");
+                    userInt = Console.ReadLine();
+                }
+                else
+                {
+                    Console.WriteLine(userInt + " is not a valid number.\nPlease enter a valid number.");
+                    userInt = Console.ReadLine();
+                }
+            }
+        }
+        return myInt;
+    }
+
+    // To be called once upon startup: Generates a hardware configuration based on user input //
     public static void Config()
     {
         ConsoleKeyInfo cki;
@@ -329,132 +381,16 @@ public static class Configuration
         Console.WriteLine("Initializing...");
 
         // Set total number of columns //
-        Console.WriteLine("Enter the total number of columns");
-        int totalColumns = 0;
-        string userColumns = Console.ReadLine();
-        while(totalColumns == 0)
-        {
-            try
-            {
-                totalColumns = Convert.ToInt32(userColumns);
-                if(totalColumns < 1)
-                {
-                    Console.WriteLine("Value cannot be less than one.");
-                    totalColumns = 0;
-                    userColumns = "";
-                }
-            }
-            catch(System.FormatException)
-            {
-                if(userColumns == "")
-                {
-                    Console.WriteLine("Please enter a valid number.");
-                    userColumns = Console.ReadLine();
-                }
-                else
-                {
-                    Console.WriteLine(userColumns + " is not a valid number.");
-                    Console.WriteLine("Please enter a valid number.");
-                    userColumns = Console.ReadLine();
-                }
-            }
-        }
+        int totalColumns = GetIntInput("Enter the total number of columns", 1);
 
         // Set cages per column //
-        Console.WriteLine("How many cages are installed per column?");
-        int cagesPerColumn = 0;
-        string userCagesPerColumn = Console.ReadLine();
-        while(cagesPerColumn == 0)
-        {
-            try
-            {
-                cagesPerColumn = Convert.ToInt32(userCagesPerColumn);
-                if(cagesPerColumn < 1)
-                {
-                    Console.WriteLine("Value cannot be less than one.");
-                    cagesPerColumn = 0;
-                    userCagesPerColumn = "";
-                }
-            }
-            catch(System.FormatException)
-            {
-                if(userCagesPerColumn == "")
-                {
-                    Console.WriteLine("Please enter a valid number.");
-                    userCagesPerColumn = Console.ReadLine();
-                }
-                else
-                {
-                    Console.WriteLine(userCagesPerColumn + " is not a valid number.");
-                    Console.WriteLine("Please enter a valid number.");
-                    userCagesPerColumn = Console.ReadLine();
-                }
-            }
-        }
+        int cagesPerColumn = GetIntInput("How many cages are installed per column?", 1);
 
         // Set number of floors //
-        Console.WriteLine("How many floors (excluding basements) are there in the building?");
-        int totalFloors = 0;
-        string userFloors = Console.ReadLine();
-        while(totalFloors == 0)
-        {
-            try
-            {
-                totalFloors = Convert.ToInt32(userFloors);
-                if(totalFloors < 1)
-                {
-                    Console.WriteLine("Value cannot be less than one.");
-                    totalFloors = 0;
-                    userFloors = "";
-                }
-            }
-            catch(System.FormatException)
-            {
-                if(userFloors == "")
-                {
-                    Console.WriteLine("Please enter a valid number.");
-                    userFloors = Console.ReadLine();
-                }
-                else
-                {
-                    Console.WriteLine(userFloors + " is not a valid number.");
-                    Console.WriteLine("Please enter a valid number.");
-                    userFloors = Console.ReadLine();
-                }
-            }
-        }
+        int totalFloors = GetIntInput("How many floors (excluding basements) are there in the building?", 2);
 
         // Set number of basements //
-        Console.WriteLine("How many basements are there?");
-        int totalBasements = 0;
-        string userBasements = Console.ReadLine();
-        while(totalBasements == 0)
-        {
-            try
-            {
-                totalBasements = Convert.ToInt32(userBasements);
-                if(totalBasements < 1)
-                {
-                    Console.WriteLine("Value cannot be less than one.");
-                    totalBasements = 0;
-                    userBasements = "";
-                }
-            }
-            catch(System.FormatException)
-            {
-                if(userBasements == "")
-                {
-                    Console.WriteLine("Please enter a valid number.");
-                    userBasements = Console.ReadLine();
-                }
-                else
-                {
-                    Console.WriteLine(userBasements + " is not a valid number.");
-                    Console.WriteLine("Please enter a valid number.");
-                    userBasements = Console.ReadLine();
-                }
-            }
-        }
+        int totalBasements = GetIntInput("How many basements are there?", 0);
 
         // Set Configuration Values //
         Configuration.batteryOn = true;
@@ -472,6 +408,35 @@ public static class Configuration
         Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Floors", Configuration.totalFloors));
         Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Basements", Configuration.totalBasements));
     }
+
+    // To be called after Config: Generates floor objects and adds them to floor list //
+    public static void GenerateFloors()
+    {
+        // Checks if building has basements and adds them to the floor list //
+        if (totalBasements > 0)
+        {
+            for (int x = 0 - totalBasements; x < 0; x++)
+            {
+                floorList.Add(new Floor(x, new CallButton("Inactive")));
+            }
+        }
+
+        // Adds remaining floors to the floor list //
+        for (int x = 1; x < 1 + totalFloors; x++)
+        {
+            floorList.Add(new Floor(x, new CallButton("Inactive")));
+        }
+    }
+
+    // Reports //
+    public static void GetFloorStatus()
+    {
+        Console.WriteLine("\n--------------FLOOR STATUS--------------");
+        for (int x = 0; x < floorList.Count; x++)
+        {
+            Console.WriteLine(String.Format("{0, -5} {1, 2} {2, -10} {3, -6}", "Floor ", floorList[x].id, ": Active // Call Status: ", floorList[x].button.status));
+        }
+    }
 }
 
 
@@ -484,6 +449,8 @@ class Program
     static void Main(string[] args)
     {
         Configuration.Config();
+        Configuration.GenerateFloors();
+        Configuration.GetFloorStatus();
     }
 }
 
