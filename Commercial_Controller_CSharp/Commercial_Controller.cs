@@ -150,10 +150,12 @@ public class CallButton
 
 public class FloorButton
 {
-    public string status = "Inactive";
+    public int id;
+    public string status;
 
-    public FloorButton(string status)
+    public FloorButton(int id, string status)
     {
+        this.id = id;
         this.status = status;
     }
 
@@ -168,13 +170,51 @@ public class FloorButton
 // Panel //
 ///////////
 
+////////////////////////////////////////////////////////////////////////
+// This object simulates a panel in the reception of the building.    //
+// This panel directs the user to the right column for their request- //
+// ed floor and sends the appropriate pickup request.                 //
+// Only one panel should be instantiated AFTER Config() has been run  //
+////////////////////////////////////////////////////////////////////////
 public class Panel
 {
-    public readonly List<FloorButton> floorButtons;
+    public readonly List<FloorButton> floorButtons = new List<FloorButton>();
 
-    public Panel(List<FloorButton> floorButtons)
+    public Panel()
     {
-        this.floorButtons = floorButtons;
+        for (int x = 0 - Configuration.totalBasements; x < 0; x++)
+        {
+            floorButtons.Add(new FloorButton(x, "Inactive"));
+        }
+        for (int x = 1; x <= Configuration.totalFloors; x++)
+        {
+            floorButtons.Add(new FloorButton(x, "Inactive"));
+        }
+    }
+
+    // Methods //
+    public void RequestElevator(int floorNumber, CageManager cageManager)
+    {
+        foreach(FloorButton button in floorButtons)
+        {
+            if (button.id == floorNumber)
+            {
+                button.status = "Active";
+            }
+        }
+
+        Column myColumn = cageManager.GetColumn(floorNumber);
+        Console.WriteLine("Floor requested. Please proceed to column " + myColumn.id);
+
+    }
+
+    // Reports //
+    public void GetFloorButtonsStatus()
+    {
+        for (int x = 0; x < this.floorButtons.Count; x++)
+        {
+            Console.WriteLine("Floor " + this.floorButtons[x].id + " button is " + this.floorButtons[x].status);
+        }
     }
 }
 
@@ -364,15 +404,15 @@ public class CageManager
     }
 
     // Returns a column where the requested floor is served //
-    public Column GetColumn(Floor reqFloor)
+    public Column GetColumn(int reqFloor)
     {
-        for (int x = 0; x < this.colList.Count; x++)
+        foreach (Column column in this.colList)
         {
-            for (int i = 0; i < this.colList[x].floorsServed.Count; i++)
+            foreach(int id in column.floorsServed)
             {
-                if (reqFloor.id == this.colList[x].floorsServed[i])
+                if (id == reqFloor)
                 {
-                    return this.colList[x];
+                    return column;
                 }
             }
         }
@@ -564,13 +604,9 @@ class Program
     {
         Configuration.Config();
         Configuration.GenerateFloors();
-        Configuration.GetFloorStatus();
         CageManager myCageManager = new CageManager();
-        myCageManager.GetCageStatus();
-        for (int x = 0; x < myCageManager.colList.Count; x++)
-        {
-            Console.WriteLine(myCageManager.GetFloorsServed(myCageManager.colList[x]));
-        }
+        Panel myPanel = new Panel();
+        myPanel.GetFloorButtonsStatus();
     }
 }
 
