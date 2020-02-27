@@ -20,13 +20,12 @@ public class Column
 {
     public readonly string status;
     public readonly List<Cage> cages;
-    public readonly List<Floor> floors;
+    public readonly List<int> floorsServed;
 
-    public Column(string status, List<Cage> cages, List<Floor> floors)
+    public Column(string status, List<Cage> cages)
     {
         this.status = status;
         this.cages = cages;
-        this.floors = floors;
     }
 }
 
@@ -218,9 +217,10 @@ public class CageManager
     // Methods //
     public Cage GetCage(string direction, int column, Floor reqFloor )
     {
+        Cage curCage = this.colList[0].cages[0];
         for (int x = 0; x < this.colList[column].cages.Count; x++)
         {
-            Cage curCage = this.colList[column].cages[x];
+            curCage = this.colList[column].cages[x];
             if (curCage.direction == direction && direction == "Up" && curCage.curFloor < reqFloor.id && (curCage.status == "In-Service" || curCage.status == "Loading"))
             {
                 // Console.WriteLine("Same direction UP was selected"); // **For debugging**
@@ -241,11 +241,10 @@ public class CageManager
                         int gapB = Math.Abs(compareCage.curFloor - reqFloor.id);
                         if (gapB < gapA)
                         {
-                            curCage = compareCage;
+                            curCage = compareCage; // Closest idle cage
                         }
                     }
                     // Console.WriteLine("Cage " + curCage.id + " is selected.") // **For debugging**
-                    return curCage; // Closest idle cage
                 }
             } else 
             {
@@ -260,16 +259,16 @@ public class CageManager
                 return curCage; // Least occupied cage
             }
         }
-        return null;
+        return curCage;
     }
 
     public Column GetColumn(Floor reqFloor)
     {
         for (int x = 0; x < this.colList.Count; x++)
         {
-            for (int i = 0; i < this.colList[x].floors.Count; i++)
+            for (int i = 0; i < this.colList[x].floorsServed.Count; i++)
             {
-                if (reqFloor == this.colList[x].floors[i])
+                if (reqFloor.id == this.colList[x].floorsServed[i])
                 {
                     return this.colList[x];
                 }
@@ -431,10 +430,10 @@ public static class Configuration
     // Reports //
     public static void GetFloorStatus()
     {
-        Console.WriteLine("\n--------------FLOOR STATUS--------------");
+        Console.WriteLine("\n-----------------FLOOR STATUS------------------\n");
         for (int x = 0; x < floorList.Count; x++)
         {
-            Console.WriteLine(String.Format("{0, -5} {1, 2} {2, -10} {3, -6}", "Floor ", floorList[x].id, ": Active // Call Status: ", floorList[x].button.status));
+            Console.WriteLine(String.Format("{0, -6} {1, 2} {2, -26} {3, -8}", "Floor ", floorList[x].id, ":  Active  //  Call Status: ", floorList[x].button.status));
         }
     }
 }
@@ -450,7 +449,6 @@ class Program
     {
         Configuration.Config();
         Configuration.GenerateFloors();
-        Configuration.GetFloorStatus();
     }
 }
 
