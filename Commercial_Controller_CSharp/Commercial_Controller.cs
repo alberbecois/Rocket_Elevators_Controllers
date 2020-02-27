@@ -18,14 +18,17 @@ using System.Collections.Generic;
 
 public class Column
 {
+    public readonly int id;
     public readonly string status;
     public readonly List<Cage> cages;
     public readonly List<int> floorsServed;
 
-    public Column(string status, List<Cage> cages)
+    public Column(int id, string status, List<Cage> cages, List<int> floorsServed)
     {
+        this.id = id;
         this.status = status;
         this.cages = cages;
+        this.floorsServed = floorsServed;
     }
 }
 
@@ -203,11 +206,68 @@ public class Request
 // Cage Manager //
 //////////////////
 
+// This object contains all the column and cage objects in the system //
+// Only one CageManager should instantiated and only after Config has //
+// been called during the initial setup.                              //
 public class CageManager
 {
     public List<Column> colList = new List<Column>();
+    
     public CageManager()
     {
+        int floorRange;
+        if (Configuration.totalBasements > 0)
+        {
+            floorRange = ((Configuration.totalFloors - 1) / (Configuration.totalColumns - 1));
+        } 
+        else 
+        {
+            floorRange = Configuration.totalFloors / Configuration.totalColumns;
+        }
+
+        List<Column> colList = this.colList;
+
+        if (Configuration.totalBasements > 0)
+        {
+            int floorCounter = 2;
+            List<int> bColumnFloors = new List<int>();
+            for (int x = 0; x < Configuration.floorList.Count; x++)
+            {
+                if (Configuration.floorList[x].id < 0)
+                {
+                    bColumnFloors.Add(Configuration.floorList[x].id);
+                }
+                bColumnFloors.Add(1);
+            }
+            colList.Add(new Column(1, "Active", this.GenerateCages(Configuration.cagesPerColumn), bColumnFloors));
+            for (int x = 2; x <= Configuration.totalColumns; x++)
+            {
+                List<int> floorsServed = new List<int>();
+                floorsServed.Add(1);
+                for (int i = 0; i < floorRange; i++)
+                {
+                    floorsServed.Add(floorCounter);
+                    floorCounter++;
+                }
+                colList.Add(new Column(x, "Active", this.GenerateCages(Configuration.cagesPerColumn), floorsServed));
+            }
+        }
+        else 
+        {
+            int floorCounter = 2;
+            for (int x = 1; x <= Configuration.totalColumns; x++)
+            {
+                List<int> floorsServed = new List<int>();
+                floorsServed.Add(1);
+                for (int i = 0; i < floorRange; i++)
+                {
+                    floorsServed.Add(floorCounter);
+                    floorCounter++;
+                }
+                colList.Add(new Column(x, "Active", this.GenerateCages(Configuration.cagesPerColumn), floorsServed));
+            }
+        }
+        
         for (int x = 1; x <= Configuration.totalColumns; x++)
         {
             // TO DO
@@ -215,6 +275,9 @@ public class CageManager
     }
 
     // Methods //
+
+    // This method loops through all cages in a given column and returns //
+    // the cage which can most efficiently fulfill the given request.    // 
     public Cage GetCage(string direction, int column, Floor reqFloor )
     {
         Cage curCage = this.colList[0].cages[0];
@@ -224,11 +287,11 @@ public class CageManager
             if (curCage.direction == direction && direction == "Up" && curCage.curFloor < reqFloor.id && (curCage.status == "In-Service" || curCage.status == "Loading"))
             {
                 // Console.WriteLine("Same direction UP was selected"); // **For debugging**
-                return curCage; // Going same direction (UP) before requested floor
+                return curCage; // Returns the cage already going the same direction (UP) that has not yet passed the requested floor
             } else if (curCage.direction == direction && direction == "Down" && curCage.curFloor < reqFloor.id && (curCage.status == "In-Service" || curCage.status == "Loading"))
             {
                 // Console.WriteLine("Same direction DOWN was selected"); // **For debugging**
-                return curCage; // Going same direction (DOWN) before requested floor
+                return curCage; // Returns the cage already going the same direction (DOWN) that has not yet passed the requested floor
             } else if (curCage.status == "Idle")
             {
                 for (int i = 0; i < this.colList[column].cages.Count; i++)
@@ -256,10 +319,10 @@ public class CageManager
                     }
                 }
                 // Console.WriteLine("Least occupied cage is selected"); // **For debugging**
-                return curCage; // Least occupied cage
+                return curCage; // Returns the least occupied cage
             }
         }
-        return curCage;
+        return curCage; // Returns the idle cage closest to the requested pickup
     }
 
     public Column GetColumn(Floor reqFloor)
@@ -295,7 +358,7 @@ public class CageManager
             for (int i = 0; i < this.colList[x].cages.Count; i++)
             {   
                 Cage curCage = this.colList[x].cages[i];
-                Console.WriteLine("Column " + x + ": Cage " + i + " is " + curCage.status);
+                Console.WriteLine("Column " + this.colList[x].id + ": Cage " + curCage.id + " is " + curCage.status);
                 Console.WriteLine("Current floor: " + curCage.curFloor + " Door status: " + curCage.doors);
             }
         }
@@ -400,6 +463,7 @@ public static class Configuration
 
         // Confirm Setup Conditions //
         Console.WriteLine("\n-------HARDWARE SIMULATION-------");
+        Console.WriteLine($"\n{"Hardware",-17} {"Value",15}\n"); // ***TODO***
         Console.WriteLine(String.Format("\n{0, -17} {1, 15}\n", "Hardware", "Value"));
         Console.WriteLine(String.Format("{0, -17} {1, 15}", "Battery", "On"));
         Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Columns", Configuration.totalColumns));
@@ -449,6 +513,9 @@ class Program
     {
         Configuration.Config();
         Configuration.GenerateFloors();
+        Configuration.GetFloorStatus();
+        CageManager myCageManager = new CageManager();
+        myCageManager.GetCageStatus();
     }
 }
 
