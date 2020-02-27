@@ -152,6 +152,11 @@ public class FloorButton
 {
     public string status = "Inactive";
 
+    public FloorButton(string status)
+    {
+        this.status = status;
+    }
+
     public void FloorButtonPressed()
     {
         this.status = "Active";
@@ -206,9 +211,11 @@ public class Request
 // Cage Manager //
 //////////////////
 
+////////////////////////////////////////////////////////////////////////
 // This object contains all the column and cage objects in the system //
 // Only one CageManager should instantiated and only after Config has //
 // been called during the initial setup.                              //
+////////////////////////////////////////////////////////////////////////
 public class CageManager
 {
     public List<Column> colList = new List<Column>();
@@ -216,13 +223,32 @@ public class CageManager
     public CageManager()
     {
         int floorRange;
+        int extraFloors;
         if (Configuration.totalBasements > 0)
         {
-            floorRange = ((Configuration.totalFloors - 1) / (Configuration.totalColumns - 1));
+            if((Configuration.totalFloors -1) % (Configuration.totalColumns -1) != 0)
+            {
+                floorRange = ((Configuration.totalFloors - 1) / (Configuration.totalColumns - 1));
+                extraFloors = ((Configuration.totalFloors - 1) % (Configuration.totalColumns - 1));
+            }
+            else
+            {
+                floorRange = ((Configuration.totalFloors - 1) / (Configuration.totalColumns - 1));
+                extraFloors = 0;
+            }
         } 
         else 
         {
-            floorRange = Configuration.totalFloors / Configuration.totalColumns;
+            if(Configuration.totalFloors % Configuration.totalColumns != 0)
+            {
+                floorRange = Configuration.totalFloors / Configuration.totalColumns;
+                extraFloors = Configuration.totalFloors % Configuration.totalColumns;
+            }
+            else
+            {
+                floorRange = Configuration.totalFloors / Configuration.totalColumns;
+                extraFloors = 0;
+            }
         }
 
         List<Column> colList = this.colList;
@@ -231,25 +257,37 @@ public class CageManager
         {
             int floorCounter = 2;
             List<int> bColumnFloors = new List<int>();
-            for (int x = 0; x < Configuration.floorList.Count; x++)
+            for (int x = 0; x < Configuration.totalBasements; x++)
             {
                 if (Configuration.floorList[x].id < 0)
                 {
                     bColumnFloors.Add(Configuration.floorList[x].id);
                 }
-                bColumnFloors.Add(1);
             }
+            bColumnFloors.Add(1);
             colList.Add(new Column(1, "Active", this.GenerateCages(Configuration.cagesPerColumn), bColumnFloors));
             for (int x = 2; x <= Configuration.totalColumns; x++)
             {
                 List<int> floorsServed = new List<int>();
                 floorsServed.Add(1);
-                for (int i = 0; i < floorRange; i++)
+                if (Configuration.totalColumns - x < extraFloors)
                 {
-                    floorsServed.Add(floorCounter);
-                    floorCounter++;
+                    for (int i = 0; i < floorRange + 1; i++)
+                    {
+                        floorsServed.Add(floorCounter);
+                        floorCounter++;
+                    }
+                    colList.Add(new Column(x, "Active", this.GenerateCages(Configuration.cagesPerColumn), floorsServed));
                 }
-                colList.Add(new Column(x, "Active", this.GenerateCages(Configuration.cagesPerColumn), floorsServed));
+                else
+                {
+                    for (int i = 0; i < floorRange; i++)
+                    {
+                        floorsServed.Add(floorCounter);
+                        floorCounter++;
+                    }
+                    colList.Add(new Column(x, "Active", this.GenerateCages(Configuration.cagesPerColumn), floorsServed));
+                }
             }
         }
         else 
@@ -325,6 +363,7 @@ public class CageManager
         return curCage; // Returns the idle cage closest to the requested pickup
     }
 
+    // Returns a column where the requested floor is served //
     public Column GetColumn(Floor reqFloor)
     {
         for (int x = 0; x < this.colList.Count; x++)
@@ -340,6 +379,7 @@ public class CageManager
         return null;
     }
 
+    // Instantiates cages based off a given number //
     public List<Cage> GenerateCages(int numCages)
     {
         List<Cage> cageList = new List<Cage>();
@@ -351,6 +391,8 @@ public class CageManager
     }
 
     // Reports //
+
+    // Prints all columns and their cages as well as their current floor and status //
     public void GetCageStatus()
     {
         for (int x = 0; x < this.colList.Count; x++)
@@ -363,6 +405,14 @@ public class CageManager
             }
         }
     }
+
+    // Returns a string of the floors served by a given column //
+    public string GetFloorsServed(Column column)
+    {
+        string myFloors = string.Join(",", column.floorsServed);
+        string myString = "Column " + column.id + ": " + myFloors;
+        return myString;
+    }
 }
 
 
@@ -370,8 +420,10 @@ public class CageManager
 // System Configuration //
 //////////////////////////
 
-// This static object generates a hardware configuration from user input and    //
-// the corresponding floor list.                                                //
+////////////////////////////////////////////////////////////////////////////////
+// This static object generates a hardware configuration from user input and  //
+// the corresponding floor list.                                              //
+////////////////////////////////////////////////////////////////////////////////
 public static class Configuration
 {
     public static bool batteryOn;
@@ -463,13 +515,12 @@ public static class Configuration
 
         // Confirm Setup Conditions //
         Console.WriteLine("\n-------HARDWARE SIMULATION-------");
-        Console.WriteLine($"\n{"Hardware",-17} {"Value",15}\n"); // ***TODO***
-        Console.WriteLine(String.Format("\n{0, -17} {1, 15}\n", "Hardware", "Value"));
-        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Battery", "On"));
-        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Columns", Configuration.totalColumns));
-        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Cages Per Column", Configuration.cagesPerColumn));
-        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Floors", Configuration.totalFloors));
-        Console.WriteLine(String.Format("{0, -17} {1, 15}", "Total Basements", Configuration.totalBasements));
+        Console.WriteLine($"\n{"Hardware",-17} {"Value",15}\n");
+        Console.WriteLine($"{"Battery", -17} {"On", 15}");
+        Console.WriteLine($"{"Total Columns", -17} {Configuration.totalColumns, 15}");
+        Console.WriteLine($"{"Cages Per Column", -17} {Configuration.cagesPerColumn, 15}");
+        Console.WriteLine($"{"Total Floors", -17} {Configuration.totalFloors, 15}");
+        Console.WriteLine($"{"Total Basements", -17} {Configuration.totalBasements, 15}");
     }
 
     // To be called after Config: Generates floor objects and adds them to floor list //
@@ -516,6 +567,10 @@ class Program
         Configuration.GetFloorStatus();
         CageManager myCageManager = new CageManager();
         myCageManager.GetCageStatus();
+        for (int x = 0; x < myCageManager.colList.Count; x++)
+        {
+            Console.WriteLine(myCageManager.GetFloorsServed(myCageManager.colList[x]));
+        }
     }
 }
 
