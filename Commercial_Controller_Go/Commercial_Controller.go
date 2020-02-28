@@ -19,12 +19,77 @@ import (
 	"strings"
 )
 
+/////////////
+// Columns //
+/////////////
+type Column struct {
+	id 				int
+	status			string
+	cages			[]Cage
+	floorsServed	[]int
+}
+
+///////////
+// Cages //
+///////////
+type Cage struct {
+	id						int
+	status					string
+	doors					string
+	pickupRequests			[]Request
+	destinationRequests		[]Request
+	curFloor				int
+	direction				string
+	timer					int
+	doorSensorStatus		string
+}
+
+/////////////
+// Buttons //
+/////////////
+type CallButton struct {
+	id		int
+	status	string
+}
+
+type FloorButton struct {
+	id		int
+	status	string
+}
+
+///////////
+// Panel //
+///////////
+type Panel struct {
+	floorButtons	[]FloorButton
+}
+
+////////////
+// Floors //
+////////////
+type Floor struct {
+	id		int
+	button	CallButton
+}
+
+//////////////
+// Requests //
+//////////////
+type Request struct {
+	status		string
+	assignment	string
+	pickup 		int
+	destination int
+	direction	string
+}
+
 //////////////////
 // Cage Manager //
 //////////////////
 
 // CageManager should be instantiated once after Configuration is completed.
 type CageManager struct {
+	colList		Column
 }
 
 //////////////////////////
@@ -39,6 +104,10 @@ type Configuration struct {
 	totalFloors    int
 	totalBasements int
 }
+
+///////////////
+// Functions //
+///////////////
 
 // Gets a y or n response from the user
 func askForConfirmation(s string) bool {
