@@ -31,6 +31,16 @@ type Column struct {
 	floorsServed []int
 }
 
+// NewColumn is a Column factory function (constructor)
+func NewColumn(id int, status string, cages []Cage, floorsServed []int) Column {
+	c := Column{}
+	c.id = id
+	c.status = status
+	c.cages = cages
+	c.floorsServed = floorsServed
+	return c
+}
+
 ///////////
 // Cages //
 ///////////
@@ -48,13 +58,12 @@ type Cage struct {
 	doorSensorStatus    string
 }
 
-func NewCage(int, string, string) *Cage {
-	c := new(Cage)
-	c.id = int
-	c.status = string
-	c.doors = string
-	c.pickupRequests = new([]Request)
-	c.destinationRequests = new([]Request)
+// NewCage is a Cage factory function (constructor)
+func NewCage(id int, status string, doors string) Cage {
+	c := Cage{}
+	c.id = id
+	c.status = status
+	c.doors = doors
 	c.curFloor = 1
 	c.direction = "Up"
 	c.timer = 0
@@ -72,10 +81,31 @@ type CallButton struct {
 	status string
 }
 
+// NewCallButton is a CallButton factory function (constructor)
+func NewCallButton(id int, status string) CallButton {
+	b := CallButton{}
+	b.id = id
+	b.status = status
+	return b
+}
+
+// CallButtonPressed sets the status of a CallButton to "Active"
+func (b CallButton) CallButtonPressed() {
+	b.status = "Active"
+}
+
 // A FloorButton per Floor object is instantiated by the Panel.
 type FloorButton struct {
 	id     int
 	status string
+}
+
+// NewFloorButton is a FloorButton factory function (constructor)
+func NewFloorButton(id int, status string) FloorButton {
+	b := FloorButton{}
+	b.id = id
+	b.status = status
+	return b
 }
 
 ///////////
@@ -87,6 +117,18 @@ type Panel struct {
 	floorButtons []FloorButton
 }
 
+// NewPanel is a Panel factory function (constructor)
+func NewPanel() Panel {
+	p := Panel{}
+	for i := 0 - myConfiguration.totalBasements; i < 0; i++ {
+		p.floorButtons = append(p.floorButtons, NewFloorButton(i, "Inactive"))
+	}
+	for i := 1; i <= myConfiguration.totalFloors; i++ {
+		p.floorButtons = append(p.floorButtons, NewFloorButton(i, "Inactive"))
+	}
+	return p
+}
+
 ////////////
 // Floors //
 ////////////
@@ -95,6 +137,14 @@ type Panel struct {
 type Floor struct {
 	id     int
 	button CallButton
+}
+
+// NewFloor is a Floor factory function (constructor)
+func NewFloor(id int, button CallButton) Floor {
+	f := Floor{}
+	f.id = id
+	f.button = button
+	return f
 }
 
 //////////////
@@ -108,6 +158,17 @@ type Request struct {
 	pickup      int
 	destination int
 	direction   string
+}
+
+// NewRequest is a Request factory function (constructor)
+func NewRequest(status string, pickup int, destination int, direction string) Request {
+	r := Request{}
+	r.status = status
+	r.assignment = "Unassigned"
+	r.pickup = pickup
+	r.destination = destination
+	r.direction = direction
+	return r
 }
 
 //////////////////
@@ -131,6 +192,8 @@ type Configuration struct {
 	totalFloors    int
 	totalBasements int
 }
+
+var myConfiguration = Configuration{}
 
 ///////////////
 // Functions //
@@ -211,6 +274,13 @@ func initialize() {
 	fmt.Printf("%15v\n", totalFloors)
 	fmt.Printf("%-17v", "Total Basements")
 	fmt.Printf("%15v\n", totalBasements)
+
+	// Set configuration values
+	myConfiguration.batteryOn = true
+	myConfiguration.totalColumns = totalColumns
+	myConfiguration.cagesPerColumn = cagesPerColumn
+	myConfiguration.totalFloors = totalFloors
+	myConfiguration.totalBasements = totalBasements
 }
 
 //////////
