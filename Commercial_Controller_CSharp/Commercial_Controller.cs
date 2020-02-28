@@ -267,7 +267,7 @@ public class Panel
             }
         }
 
-        Column myColumn = cageManager.GetColumn(floorNumber);
+        Column myColumn = cageManager.GetColumn(1, floorNumber);
         Console.WriteLine("Floor requested. Please proceed to column " + myColumn.id);
 
     }
@@ -457,29 +457,40 @@ public class CageManager
                 Console.WriteLine("Same direction UP was selected"); // **For debugging**
                 return curCage; // Returns the cage already going the same direction (UP) that has not yet passed the requested floor
             } 
-            else if (curCage.direction == direction && direction == "Down" && curCage.curFloor < reqFloor && (curCage.status == "In-Service" || curCage.status == "Loading"))
+            else if (curCage.direction == direction && direction == "Down" && curCage.curFloor > reqFloor && (curCage.status == "In-Service" || curCage.status == "Loading"))
             {
                 Console.WriteLine("Same direction DOWN was selected"); // **For debugging**
                 return curCage; // Returns the cage already going the same direction (DOWN) that has not yet passed the requested floor
             } 
             else if (curCage.status == "Idle")
             {
-                for (int i = x+1; i < this.colList[column].cages.Count; i++)
+                bool allCagesAreIdle = true;
+                for(int r = 0; r < this.colList[column].cages.Count; r++)
                 {
-                    Cage compareCage = this.colList[column].cages[i];
-                    if(compareCage.status == "Idle")
+                    if(this.colList[column].cages[r].status != "Idle")
                     {
-                        Console.WriteLine("Cage " + bestCage.id + " to be compared to " + compareCage.id); // **For debugging**
-                        int gapA = Math.Abs(bestCage.curFloor - reqFloor);
-                        int gapB = Math.Abs(compareCage.curFloor - reqFloor);
-                        if (gapB < gapA)
-                        {
-                            bestCage = compareCage; // Closest idle cage
-                        }
+                        allCagesAreIdle = false;
                     }
-                    Console.WriteLine("Cage " + curCage.id + " is selected."); // **For debugging**
                 }
-                return bestCage;
+                if(allCagesAreIdle)
+                {
+                    for (int i = x+1; i < this.colList[column].cages.Count; i++)
+                    {
+                        Cage compareCage = this.colList[column].cages[i];
+                        if(compareCage.status == "Idle")
+                        {
+                            Console.WriteLine("Cage " + bestCage.id + " to be compared to " + compareCage.id); // **For debugging**
+                            int gapA = Math.Abs(bestCage.curFloor - reqFloor);
+                            int gapB = Math.Abs(compareCage.curFloor - reqFloor);
+                            if (gapB < gapA)
+                            {
+                                bestCage = compareCage; // Closest idle cage
+                            }
+                        }
+                        Console.WriteLine("Cage " + curCage.id + " is selected."); // **For debugging**
+                    }
+                    return bestCage;
+                }
             } 
             else 
             {
@@ -502,13 +513,23 @@ public class CageManager
     }
 
     // Returns a column where the requested floor is served //
-    public Column GetColumn(int reqFloor)
+    public Column GetColumn(int pickup, int destination)
     {
+        bool pickupServed = false;
+        bool destServed = false;
         foreach (Column column in this.colList)
         {
             foreach(int id in column.floorsServed)
             {
-                if (id == reqFloor)
+                if (id == pickup)
+                {
+                    pickupServed = true;
+                }
+                if (id == destination)
+                {
+                    destServed = true;
+                }
+                if (pickupServed && destServed)
                 {
                     return column;
                 }
@@ -782,13 +803,14 @@ class Program
         }
     }
 
+    // Assign each request to an elevator //
     static void AssignElevator(CageManager myCageManager)
     {
         foreach(Request request in requestQueue)
         {
             if(request.assignment == "Unassigned")
             {
-                    Column myColumn = myCageManager.GetColumn(request.pickup);
+                    Column myColumn = myCageManager.GetColumn(request.pickup, request.destination);
                     Console.WriteLine("Column " + myColumn.id + " is selected.");
                     Cage myCage = myCageManager.GetCage(request.direction, myColumn.id -1, request.pickup);
                     request.assignment = "Assigned";
@@ -805,7 +827,7 @@ class Program
         {
             foreach (Cage cage in myCageManager.colList[0].cages)
             {
-               if(cage.pickupRequests.Count > 0)
+               if(cage.pickupRequests.Count != 0)
                {
                    if(cage.curFloor != cage.pickupRequests[0].pickup && cage.curFloor > cage.pickupRequests[0].pickup)
                    {
@@ -822,7 +844,7 @@ class Program
                        cage.CleanUpRequests();
                    }
                }
-               if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count > 0)
+               if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count != 0)
                {
                    if(cage.curFloor != cage.destinationRequests[0].destination && cage.curFloor > cage.destinationRequests[0].destination)
                    {
@@ -844,7 +866,7 @@ class Program
             {
                 foreach(Cage cage in myCageManager.colList[x].cages)
                 {
-                    if(cage.pickupRequests.Count > 0)
+                    if(cage.pickupRequests.Count != 0)
                     {
                         if(cage.curFloor != cage.pickupRequests[0].pickup && cage.curFloor > cage.pickupRequests[0].pickup)
                         {
@@ -861,7 +883,7 @@ class Program
                             cage.CleanUpRequests();
                         }
                     }
-                    if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count > 0)
+                    if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count != 0)
                     {
                         if(cage.curFloor != cage.destinationRequests[0].destination && cage.curFloor > cage.destinationRequests[0].destination)
                         {
@@ -873,6 +895,7 @@ class Program
                         }
                         else if (cage.curFloor == cage.destinationRequests[0].destination)
                         {
+                            Console.WriteLine(cage.curFloor + " is cage " + cage.id + " current floor and current destination is " + cage.destinationRequests[0].destination);
                             cage.OpenDoors();
                             cage.destinationRequests[0].status = "Completed";
                             cage.CleanUpRequests();
@@ -887,7 +910,7 @@ class Program
             {
                 foreach(Cage cage in column.cages)
                 {
-                    if(cage.pickupRequests.Count > 0)
+                    if(cage.pickupRequests.Count != 0)
                     {
                         if(cage.curFloor != cage.pickupRequests[0].pickup && cage.curFloor > cage.pickupRequests[0].pickup)
                         {
@@ -904,7 +927,7 @@ class Program
                             cage.CleanUpRequests();
                         }
                     }
-                    if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count > 0)
+                    if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count != 0)
                     {
                         if(cage.curFloor != cage.destinationRequests[0].destination && cage.curFloor > cage.destinationRequests[0].destination)
                         {
@@ -958,15 +981,16 @@ class Program
         requestQueue.Add(new Request("Destination", 0, 15, "Up"));
         requestQueue[1].assignment = "Assigned";
         myCageManager.colList[1].cages[1].destinationRequests.Add(requestQueue[1]);
-        requestQueue.Add(new Request("Destination", 0, 13, "Down"));
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
         requestQueue[2].assignment = "Assigned";
         myCageManager.colList[1].cages[2].destinationRequests.Add(requestQueue[2]);
         requestQueue.Add(new Request("Destination", 0, 2, "Down"));
         requestQueue[3].assignment = "Assigned";
         myCageManager.colList[1].cages[3].destinationRequests.Add(requestQueue[3]);
-        requestQueue.Add(new Request("Destination", 0, 6, "Down"));
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
         requestQueue[4].assignment = "Assigned";
         myCageManager.colList[1].cages[4].destinationRequests.Add(requestQueue[4]);
+        LoopTest(myPanel, myCageManager);
         requestQueue.Add(new Request("Pickup", 1, 20, "Up"));
         while(requestQueue.Count > 0)
         {
@@ -975,19 +999,96 @@ class Program
         myCageManager.GetCageStatus();
     }
 
-    static void Scenario2()
+    static void Scenario2(Panel myPanel, CageManager myCageManager)
     {
-        Console.WriteLine("Scenario2");
+        myCageManager.colList[2].cages[0].curFloor = 1;
+        myCageManager.colList[2].cages[1].curFloor = 23;
+        myCageManager.colList[2].cages[2].curFloor = 33;
+        myCageManager.colList[2].cages[3].curFloor = 40;
+        myCageManager.colList[2].cages[4].curFloor = 39;
+        requestQueue.Add(new Request("Destination", 0, 21, "Up"));
+        requestQueue[0].assignment = "Assigned";
+        myCageManager.colList[2].cages[0].destinationRequests.Add(requestQueue[0]);
+        requestQueue.Add(new Request("Destination", 0, 28, "Up"));
+        requestQueue[1].assignment = "Assigned";
+        myCageManager.colList[2].cages[1].destinationRequests.Add(requestQueue[1]);
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
+        requestQueue[2].assignment = "Assigned";
+        myCageManager.colList[2].cages[2].destinationRequests.Add(requestQueue[2]);
+        requestQueue.Add(new Request("Destination", 0, 24, "Down"));
+        requestQueue[3].assignment = "Assigned";
+        myCageManager.colList[2].cages[3].destinationRequests.Add(requestQueue[3]);
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
+        requestQueue[4].assignment = "Assigned";
+        myCageManager.colList[2].cages[4].destinationRequests.Add(requestQueue[4]);
+        requestQueue.Add(new Request("Pickup", 1, 36, "Up"));
+        while(requestQueue.Count > 0)
+        {
+            LoopTest(myPanel, myCageManager);
+        }
+        myCageManager.GetCageStatus();
     }
 
-    static void Scenario3()
+    static void Scenario3(Panel myPanel, CageManager myCageManager)
     {
-        Console.WriteLine("Scenario3");
+        myCageManager.colList[3].cages[0].curFloor = 58;
+        myCageManager.colList[3].cages[1].curFloor = 50;
+        myCageManager.colList[3].cages[2].curFloor = 46;
+        myCageManager.colList[3].cages[3].curFloor = 1;
+        myCageManager.colList[3].cages[4].curFloor = 60;
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
+        requestQueue[0].assignment = "Assigned";
+        myCageManager.colList[3].cages[0].destinationRequests.Add(requestQueue[0]);
+        requestQueue.Add(new Request("Destination", 0, 60, "Up"));
+        requestQueue[1].assignment = "Assigned";
+        myCageManager.colList[3].cages[1].destinationRequests.Add(requestQueue[1]);
+        requestQueue.Add(new Request("Destination", 0, 58, "Up"));
+        requestQueue[2].assignment = "Assigned";
+        myCageManager.colList[3].cages[2].destinationRequests.Add(requestQueue[2]);
+        requestQueue.Add(new Request("Destination", 0, 54, "Up"));
+        requestQueue[3].assignment = "Assigned";
+        myCageManager.colList[3].cages[3].destinationRequests.Add(requestQueue[3]);
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
+        requestQueue[4].assignment = "Assigned";
+        myCageManager.colList[3].cages[4].destinationRequests.Add(requestQueue[4]);
+        LoopTest(myPanel, myCageManager);
+        requestQueue.Add(new Request("Pickup", 54, 1, "Down"));
+        while(requestQueue.Count > 0)
+        {
+            LoopTest(myPanel, myCageManager);
+        }
+        myCageManager.GetCageStatus();
     }
 
-    static void Scenario4()
+    static void Scenario4(Panel myPanel, CageManager myCageManager)
     {
-        Console.WriteLine("Scenario4");
+        myCageManager.colList[0].cages[0].curFloor = -4;
+        myCageManager.colList[0].cages[1].curFloor = 1;
+        myCageManager.colList[0].cages[2].curFloor = -3;
+        myCageManager.colList[0].cages[3].curFloor = -6;
+        myCageManager.colList[0].cages[4].curFloor = -1;
+        myCageManager.colList[0].cages[2].status = "Loading";
+        myCageManager.colList[0].cages[3].status = "Loading";
+        myCageManager.colList[0].cages[4].status = "Loading";
+        myCageManager.colList[0].cages[2].direction = "Down";
+        myCageManager.colList[0].cages[3].direction = "Up";
+        myCageManager.colList[0].cages[4].direction = "Down";
+        requestQueue.Add(new Request("Destination", 0, -5, "Down"));
+        requestQueue[0].assignment = "Assigned";
+        myCageManager.colList[0].cages[2].destinationRequests.Add(requestQueue[0]);
+        requestQueue.Add(new Request("Destination", 0, 1, "Up"));
+        requestQueue[1].assignment = "Assigned";
+        myCageManager.colList[0].cages[3].destinationRequests.Add(requestQueue[1]);
+        requestQueue.Add(new Request("Destination", 0, -6, "Down"));
+        requestQueue[2].assignment = "Assigned";
+        myCageManager.colList[0].cages[4].destinationRequests.Add(requestQueue[2]);
+        LoopTest(myPanel, myCageManager);
+        requestQueue.Add(new Request("Pickup", -3, 1, "Up"));
+        while(requestQueue.Count > 0)
+        {
+            LoopTest(myPanel, myCageManager);
+        }
+        myCageManager.GetCageStatus();
     }
 
     static void Main(string[] args)
@@ -1008,6 +1109,15 @@ class Program
             } else if(cki.Key == ConsoleKey.N)
             {
                 Configuration.Config();
+                Configuration.GenerateFloors();
+                CageManager userCageManager = new CageManager();
+                Panel userPanel = new Panel();
+                userCageManager.GetCageStatus();
+                foreach(Column column in userCageManager.colList)
+                {
+                    string report = userCageManager.GetFloorsServed(column);
+                    Console.WriteLine(report);
+                }
                 useDemoConfig = false;
                 return;
             }
@@ -1040,7 +1150,6 @@ class Program
 
         // INSTANTIATE PANEL //
         Panel myPanel = new Panel();
-        Console.WriteLine("Test");
 
         while(Configuration.batteryOn)
         {
@@ -1051,15 +1160,15 @@ class Program
             }
             else if (selection == 2)
             {
-                Scenario2();
+                Scenario2(myPanel, myCageManager);
             }
             else if (selection == 3)
             {
-                Scenario3();
+                Scenario3(myPanel, myCageManager);
             }
             else if (selection == 4)
             {
-                Scenario4();
+                Scenario4(myPanel, myCageManager);
             }
             else if (selection == 5)
             {
