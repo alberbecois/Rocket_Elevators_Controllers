@@ -822,7 +822,7 @@ class Program
                        cage.CleanUpRequests();
                    }
                }
-               if(cage.destinationRequests.Count > 0)
+               if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count > 0)
                {
                    if(cage.curFloor != cage.destinationRequests[0].destination && cage.curFloor > cage.destinationRequests[0].destination)
                    {
@@ -861,7 +861,7 @@ class Program
                             cage.CleanUpRequests();
                         }
                     }
-                    if(cage.destinationRequests.Count > 0)
+                    if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count > 0)
                     {
                         if(cage.curFloor != cage.destinationRequests[0].destination && cage.curFloor > cage.destinationRequests[0].destination)
                         {
@@ -904,7 +904,7 @@ class Program
                             cage.CleanUpRequests();
                         }
                     }
-                    if(cage.destinationRequests.Count > 0)
+                    if(cage.pickupRequests.Count == 0 && cage.destinationRequests.Count > 0)
                     {
                         if(cage.curFloor != cage.destinationRequests[0].destination && cage.curFloor > cage.destinationRequests[0].destination)
                         {
@@ -945,9 +945,34 @@ class Program
         CleanUpQueue();
     }
 
-    static void Scenario1()
+    static void Scenario1(Panel myPanel, CageManager myCageManager)
     {
-        Console.WriteLine("Scenario1");
+        myCageManager.colList[1].cages[0].curFloor = 20;
+        myCageManager.colList[1].cages[1].curFloor = 3;
+        myCageManager.colList[1].cages[2].curFloor = 13;
+        myCageManager.colList[1].cages[3].curFloor = 15;
+        myCageManager.colList[1].cages[4].curFloor = 6;
+        requestQueue.Add(new Request("Destination", 0, 5, "Down"));
+        requestQueue[0].assignment = "Assigned";
+        myCageManager.colList[1].cages[0].destinationRequests.Add(requestQueue[0]);
+        requestQueue.Add(new Request("Destination", 0, 15, "Up"));
+        requestQueue[1].assignment = "Assigned";
+        myCageManager.colList[1].cages[1].destinationRequests.Add(requestQueue[1]);
+        requestQueue.Add(new Request("Destination", 0, 13, "Down"));
+        requestQueue[2].assignment = "Assigned";
+        myCageManager.colList[1].cages[2].destinationRequests.Add(requestQueue[2]);
+        requestQueue.Add(new Request("Destination", 0, 2, "Down"));
+        requestQueue[3].assignment = "Assigned";
+        myCageManager.colList[1].cages[3].destinationRequests.Add(requestQueue[3]);
+        requestQueue.Add(new Request("Destination", 0, 6, "Down"));
+        requestQueue[4].assignment = "Assigned";
+        myCageManager.colList[1].cages[4].destinationRequests.Add(requestQueue[4]);
+        requestQueue.Add(new Request("Pickup", 1, 20, "Up"));
+        while(requestQueue.Count > 0)
+        {
+            LoopTest(myPanel, myCageManager);
+        }
+        myCageManager.GetCageStatus();
     }
 
     static void Scenario2()
@@ -1022,7 +1047,7 @@ class Program
             int selection = Configuration.GetIntInput("\nPlease select a scenario\n(1,2,3,4 or 5 to EXIT)\n", 0);
             if(selection == 1)
             {
-                Scenario1();
+                Scenario1(myPanel, myCageManager);
             }
             else if (selection == 2)
             {
