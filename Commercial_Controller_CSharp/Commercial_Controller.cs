@@ -433,11 +433,6 @@ public class CageManager
                 colList.Add(new Column(x, "Active", this.GenerateCages(Configuration.cagesPerColumn), floorsServed));
             }
         }
-        
-        for (int x = 1; x <= Configuration.totalColumns; x++)
-        {
-            // TO DO
-        }
     }
 
     // Methods //
