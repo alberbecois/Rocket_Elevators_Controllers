@@ -1,7 +1,90 @@
-# Residential Controller v1.00
+# Rocket Elevator Controllers v1.00
 
-[CodeBoxx Technology School - Odyssey Week 2 Assignment.]
+[CodeBoxx Technology School - Odyssey Week 3 Assignment.]
 
+## Commercial Controllers
+## Getting Started
+### Requirements
+
+* [.NET Framework](https://dotnet.microsoft.com/) - Needed to run the C# version
+* [GO Lang](https://golang.org/) - For the current alpha of the Go version
+
+## Running the tests
+
+C# ONLY - On startup you will be asked if you want to run the demo setup or not. If you select no, you will be prompted to make your own hardware setup which will then generate the appropriate amount of floors columns etc based on your input before exiting the program. It is required to use the demo setup to run the test scenarios. When you select yes, the test environment of 4 columns, 5 cages per column, 60 floors and 6 basements will be generated. You will then be prompted to select a test scenario for simulation. 
+
+GO ONLY - The scenarios are not presently functional in the Go version but you can still use the feature of generating your own hardware environment. The menu runs almost entirely the same. 
+
+## Scenarios
+### C#
+```csharp
+static void Scenario1(Panel myPanel, CageManager myCageManager)
+    {
+        myCageManager.colList[1].cages[0].curFloor = 20;
+        myCageManager.colList[1].cages[1].curFloor = 3;
+        myCageManager.colList[1].cages[2].curFloor = 13;
+        myCageManager.colList[1].cages[3].curFloor = 15;
+        myCageManager.colList[1].cages[4].curFloor = 6;
+        requestQueue.Add(new Request("Destination", 0, 5, "Down"));
+        requestQueue[0].assignment = "Assigned";
+        myCageManager.colList[1].cages[0].destinationRequests.Add(requestQueue[0]);
+        requestQueue.Add(new Request("Destination", 0, 15, "Up"));
+        requestQueue[1].assignment = "Assigned";
+        myCageManager.colList[1].cages[1].destinationRequests.Add(requestQueue[1]);
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
+        requestQueue[2].assignment = "Assigned";
+        myCageManager.colList[1].cages[2].destinationRequests.Add(requestQueue[2]);
+        requestQueue.Add(new Request("Destination", 0, 2, "Down"));
+        requestQueue[3].assignment = "Assigned";
+        myCageManager.colList[1].cages[3].destinationRequests.Add(requestQueue[3]);
+        requestQueue.Add(new Request("Destination", 0, 1, "Down"));
+        requestQueue[4].assignment = "Assigned";
+        myCageManager.colList[1].cages[4].destinationRequests.Add(requestQueue[4]);
+        LoopTest(myPanel, myCageManager);
+        requestQueue.Add(new Request("Pickup", 1, 20, "Up"));
+        while(requestQueue.Count > 0)
+        {
+            LoopTest(myPanel, myCageManager);
+        }
+        myCageManager.GetCageStatus();
+    }
+```
+
+### Go
+```go
+func Scenario1(myPanel Panel, myCageManager CageManager) {
+	myCageManager.colList[1].cages[0].curFloor = 20
+	myCageManager.colList[1].cages[1].curFloor = 3
+	myCageManager.colList[1].cages[2].curFloor = 13
+	myCageManager.colList[1].cages[3].curFloor = 15
+	myCageManager.colList[1].cages[4].curFloor = 6
+	requestQueue = append(requestQueue, NewRequest("Destination", 0, 5, "Down"))
+	requestQueue[0].assignment = "Assigned"
+	myCageManager.colList[1].cages[0].destinationRequests = append(myCageManager.colList[1].cages[0].destinationRequests, requestQueue[0])
+	requestQueue = append(requestQueue, NewRequest("Destination", 0, 15, "Up"))
+	requestQueue[1].assignment = "Assigned"
+	myCageManager.colList[1].cages[1].destinationRequests = append(myCageManager.colList[1].cages[1].destinationRequests, requestQueue[1])
+	requestQueue = append(requestQueue, NewRequest("Destination", 0, 1, "Down"))
+	requestQueue[2].assignment = "Assigned"
+	myCageManager.colList[1].cages[2].destinationRequests = append(myCageManager.colList[1].cages[2].destinationRequests, requestQueue[2])
+	requestQueue = append(requestQueue, NewRequest("Destination", 0, 2, "Down"))
+	requestQueue[3].assignment = "Assigned"
+	myCageManager.colList[1].cages[3].destinationRequests = append(myCageManager.colList[1].cages[3].destinationRequests, requestQueue[3])
+	requestQueue = append(requestQueue, NewRequest("Destination", 0, 1, "Down"))
+	requestQueue[4].assignment = "Assigned"
+	myCageManager.colList[1].cages[4].destinationRequests = append(myCageManager.colList[1].cages[4].destinationRequests, requestQueue[4])
+	LoopTest(myPanel, myCageManager)
+	requestQueue = append(requestQueue, NewRequest("Pickup", 1, 20, "Up"))
+	for len(requestQueue) > 0 {
+		LoopTest(myPanel, myCageManager)
+	}
+	myCageManager.GetCageStatus()
+}
+```
+
+The structure of the test scenarios differs a bit from the Residential version with the addition of a new LoopTest function which simulates the program running in a real environment and supports new requests made during the execution loop. The Go version has pointer errors making the Scenario loop infinitely at the moment but the structure is mostly the same. The same reporting functions from the Residential Controllers are present in these new Controllers, please review below for more information.
+
+## Residential Controllers
 ## Getting Started
 ### Requirements
 
@@ -66,7 +149,7 @@ Can be called at anytime from a cage object to get the status of all floor butto
 ## Notes
 ### Version Notes
 
-1.00 - Launches support for Python and JavaScript
+1.00 - Launches support for Commercial Controllers on C# and Go (alpha). Residential Controllers in Javascript and Python
 
 ### JavaScript
 
