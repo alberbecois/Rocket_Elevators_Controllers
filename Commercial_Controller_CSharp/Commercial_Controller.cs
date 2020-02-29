@@ -4,7 +4,7 @@
 // Author: {Joshua Knutson}                          //
 // License: {GNUGPLv3}                               //
 // Link: {https://www.gnu.org/licenses/gpl-3.0.html} //
-// Version: {0.01}                                   //
+// Version: {1.00}                                   //
 // Contact: {github.com/alberbecois}                 //
 ///////////////////////////////////////////////////////
 
@@ -816,6 +816,7 @@ class Program
         }
     }
 
+    // Move all elevators towards next destination or pickup
     static void MoveElevators(CageManager myCageManager)
     {
         if (Configuration.totalBasements > 0)
@@ -890,7 +891,6 @@ class Program
                         }
                         else if (cage.curFloor == cage.destinationRequests[0].destination)
                         {
-                            Console.WriteLine(cage.curFloor + " is cage " + cage.id + " current floor and current destination is " + cage.destinationRequests[0].destination);
                             cage.OpenDoors();
                             cage.destinationRequests[0].status = "Completed";
                             cage.CleanUpRequests();
@@ -944,6 +944,7 @@ class Program
         }
     }
 
+    // Checks the requestQueue for completed requests that need removed
     static void CleanUpQueue()
     {
         for (int x = requestQueue.Count -1; x >= 0; x--)
